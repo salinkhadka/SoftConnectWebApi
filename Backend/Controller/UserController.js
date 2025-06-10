@@ -114,27 +114,40 @@ exports.getOneUser = async (req, res) => {
 };
 
 // Update one user
+// Update one user
 exports.updateOneUser = async (req, res) => {
-  const { firstName, lastName, bio, profilePhoto } = req.body;
+  const { firstName, lastName, bio } = req.body;
+  const fileName = req.file?.path;
 
   try {
-    await User.updateOne(
-      { _id: req.params.id },
-      {
-        $set: {
-          firstName,
-          lastName,
-          bio,
-          profilePhoto,
-        },
-      }
+    const updateFields = {
+      firstName,
+      lastName,
+      bio,
+    };
+
+    // Only update profilePhoto if a new file was uploaded
+    if (fileName) {
+      updateFields.profilePhoto = fileName;
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateFields },
+      { new: true }
     );
 
-    return res.status(200).json({ success: true, message: "User updated successfully" });
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({ success: true, message: "User updated successfully", data: updatedUser });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // Delete one user
 exports.deleteOneUser = async (req, res) => {
