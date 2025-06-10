@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 // Register
 exports.registerUser = async (req, res) => {
   const { username, email, password, userId, StudentId, usertype, role } = req.body;
+  const fileName=req.file?.path
 
   if (!email || !password || !userId) {
     return res.status(400).json({ success: false, message: "Missing fields" });
@@ -27,6 +28,7 @@ exports.registerUser = async (req, res) => {
       email,
       userId,
       StudentId,
+      profilePhoto:fileName,
       password: hashedPassword,
       usertype: usertype || 'normal',
       role: role || 'normal'

@@ -3,12 +3,14 @@ const express = require('express');
 const connectDB = require('./Config/db');
 const User = require('./Model/UserModel');
 const userRoutes=require('./Route/UserRoute')
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 
 
 connectDB();
+app.use("/uploads",express.static(path.join(__dirname,"uploads")))
 app.use(express.json());
 
 
