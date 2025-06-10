@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 // Register
 exports.registerUser = async (req, res) => {
-  const { username, email, password, userId, StudentId } = req.body;
+  const { username, email, password, userId, StudentId, usertype, role } = req.body;
 
   if (!email || !password || !userId) {
     return res.status(400).json({ success: false, message: "Missing fields" });
@@ -28,6 +28,8 @@ exports.registerUser = async (req, res) => {
       userId,
       StudentId,
       password: hashedPassword,
+      usertype: usertype || 'normal',
+      role: role || 'normal'
     });
 
     await newUser.save();
@@ -39,6 +41,7 @@ exports.registerUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // Login
 exports.loginUser = async (req, res) => {
