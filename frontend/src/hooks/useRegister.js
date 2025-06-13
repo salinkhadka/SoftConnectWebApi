@@ -1,20 +1,20 @@
-import { useMutation } from "@tanstack/react-query"; //useMutation is used for POST Put Patch Delete request state
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { registerUserService } from "../services/authService";
-// import { data } from "react-router-dom";
 import { toast } from "react-toastify";
 
-export const useRegisterUser = () =>{
-    return useMutation(
-        {
-            mutationFn:registerUserService, //what function to run
-            mutationKey:['register'],
-            onSuccess:(data)=>{
-                toast.success(data?.message || "registration sucess")
-            },
-            onError:(err)=>{ 
-                toast.success(err?.message || "registration sucess")
-            },
-        }
-    )
-}
-//mutationFn:(formData)=> registerUserService(formdata)
+export const useRegisterUser = () => {
+  const navigate = useNavigate(); // ✅ Hook at top level
+
+  return useMutation({
+    mutationFn: registerUserService,
+    mutationKey: ["register"],
+    onSuccess: (data) => {
+      toast.success(data?.message || "Registration success");
+      navigate("/login", { replace: true }); // ✅ Navigate after success
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Registration failed");
+    },
+  });
+};

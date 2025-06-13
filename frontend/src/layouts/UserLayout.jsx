@@ -8,9 +8,13 @@ import SignupPage from '../pages/SignupPage'
 function UserLayout() {
   return (
     <div>
-        <Header/>
+        
+        {/* <div className="bg-red-500 text-white text-4xl p-8">
+      If you see a big red box, Tailwind is working! 🎉
+    </div> */}
+
         <Outlet/>
-        <Footer/>
+        {/* <Footer/> */}
     </div>
   )
 }

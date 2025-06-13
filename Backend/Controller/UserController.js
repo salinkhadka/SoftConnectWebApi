@@ -5,8 +5,8 @@ const mongoose = require('mongoose');
 
 // Register
 exports.registerUser = async (req, res) => {
-  const { username, email, password, userId, StudentId, usertype, role } = req.body;
-  const fileName=req.file?.path
+  const { username, email, password, userId, StudentId, role, bio } = req.body;
+  const fileName = req.file?.path;
 
   if (!email || !password || !userId) {
     return res.status(400).json({ success: false, message: "Missing fields" });
@@ -14,7 +14,7 @@ exports.registerUser = async (req, res) => {
 
   try {
     const existingUser = await User.findOne({
-      $or: [{ username }, { email }, { userId }],
+      $or: [{ username }, { email }, { userId },{StudentId}],
     });
 
     if (existingUser) {
@@ -28,10 +28,10 @@ exports.registerUser = async (req, res) => {
       email,
       userId,
       StudentId,
-      profilePhoto:fileName,
+      profilePhoto: fileName || '', // optional, default empty
       password: hashedPassword,
-      usertype: usertype || 'normal',
-      role: role || 'normal'
+      role: role || 'normal',
+      bio: bio || '', // optional, default empty
     });
 
     await newUser.save();
@@ -43,7 +43,6 @@ exports.registerUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 
 // Login
 exports.loginUser = async (req, res) => {
@@ -93,7 +92,7 @@ exports.getUsers = async (req, res) => {
     });
   } catch (err) {
     return res.status(500).json({ success: false, message: "Server error" });
-  } 
+  }
 };
 
 // Get one user
@@ -114,18 +113,16 @@ exports.getOneUser = async (req, res) => {
 };
 
 // Update one user
-// Update one user
 exports.updateOneUser = async (req, res) => {
   const { firstName, lastName, bio } = req.body;
   const fileName = req.file?.path;
 
   try {
-    const updateFields = {
-      firstName,
-      lastName,
-      bio,
-    };
+    const updateFields = {};
 
+    if (firstName !== undefined) updateFields.firstName = firstName;
+    if (lastName !== undefined) updateFields.lastName = lastName;
+    if (bio !== undefined) updateFields.bio = bio;
     // Only update profilePhoto if a new file was uploaded
     if (fileName) {
       updateFields.profilePhoto = fileName;
@@ -147,7 +144,6 @@ exports.updateOneUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 
 // Delete one user
 exports.deleteOneUser = async (req, res) => {
