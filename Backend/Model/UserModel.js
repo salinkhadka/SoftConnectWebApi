@@ -22,10 +22,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    usertype: {
-      type: String,
-      default: 'normal',
-    },
     profilePhoto: {
       type: String, // URL or file path
       default: '',
