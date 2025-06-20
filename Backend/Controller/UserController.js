@@ -112,22 +112,20 @@ exports.getOneUser = async (req, res) => {
   }
 };
 
-// Update one user
 exports.updateOneUser = async (req, res) => {
-  const { firstName, lastName, bio } = req.body;
-  const fileName = req.file?.path;
+  // Destructure updatable fields from req.body
+  const { username, bio, role } = req.body;
+  const fileName = req.file?.path; // uploaded profile photo if any
 
   try {
+    // Build updateFields object with only provided fields
     const updateFields = {};
-
-    if (firstName !== undefined) updateFields.firstName = firstName;
-    if (lastName !== undefined) updateFields.lastName = lastName;
+    if (username !== undefined) updateFields.username = username;
     if (bio !== undefined) updateFields.bio = bio;
-    // Only update profilePhoto if a new file was uploaded
-    if (fileName) {
-      updateFields.profilePhoto = fileName;
-    }
+    if (role !== undefined) updateFields.role = role;
+    if (fileName) updateFields.profilePhoto = fileName;
 
+    // Find and update user by id
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { $set: updateFields },
@@ -138,7 +136,11 @@ exports.updateOneUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
-    return res.status(200).json({ success: true, message: "User updated successfully", data: updatedUser });
+    return res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      data: updatedUser,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: "Server error" });
