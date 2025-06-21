@@ -26,6 +26,9 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
   const [editingUserId, setEditingUserId] = useState(null);
   const [editImage, setEditImage] = useState(null);
 
+  const [openDelete, setOpenDelete] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
   const editingUser = useMemo(
     () => users.find((u) => u._id === editingUserId),
     [editingUserId, users]
@@ -90,7 +93,10 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
                     variant="contained"
                     size="small"
                     color="error"
-                    onClick={() => onDelete(user)}
+                    onClick={() => {
+                      setUserToDelete(user);
+                      setOpenDelete(true);
+                    }}
                   >
                     Delete
                   </Button>
@@ -175,7 +181,6 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
                     ))}
                   </TextField>
 
-                  {/* Image preview */}
                   {(editImage || editingUser.profilePhoto) && (
                     <img
                       src={
@@ -208,6 +213,32 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
             </Formik>
           )}
         </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete user <strong>{userToDelete?.username}</strong>?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDelete(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (userToDelete) {
+                onDelete(userToDelete);
+                setOpenDelete(false);
+                setUserToDelete(null);
+              }
+            }}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Paper>
   );
