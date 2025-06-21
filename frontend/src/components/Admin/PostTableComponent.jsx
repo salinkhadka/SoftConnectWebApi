@@ -1,20 +1,12 @@
 import React, { useState } from "react";
-// import {getBackendImageUrl}=require("../../utils/getBackendImageUrl");
-
 import {
   Button, Table, TableBody, TableCell, TableHead, TableRow, Paper,
   Dialog, DialogTitle, DialogContent, DialogActions, Typography, TextField
 } from "@mui/material";
-// import DeleteModal from "../DeleteModal";
-import DeleteModal from "../DeleteModal";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-
-const getImageUrl = (filename) => {
-  if (!filename) return "";
-  const clean = filename.replace(/^[/\\]+/, "");
-  return `http://localhost:2000/${clean}`;
-};
+import DeleteModal from "../DeleteModal";
+import { getBackendImageUrl } from "../../utils/getBackendImageUrl"; // ✅ Correct import
 
 const EditSchema = Yup.object({
   content: Yup.string().required("Content is required"),
@@ -25,7 +17,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
   const [openEdit, setOpenEdit] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
-  const [editImage, setEditImage] = useState(null); // For image preview
+  const [editImage, setEditImage] = useState(null);
 
   const handleView = (post) => {
     setSelectedPost(post);
@@ -34,7 +26,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
 
   const handleEdit = (post) => {
     setSelectedPost(post);
-    setEditImage(null); // Reset image preview
+    setEditImage(null);
     setOpenEdit(true);
   };
 
@@ -81,7 +73,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                 <TableCell>
                   {post.imageUrl ? (
                     <img
-                      src={getImageUrl(post.imageUrl)}
+                      src={getBackendImageUrl(post.imageUrl)}
                       alt="post"
                       style={{ width: 60, height: 60, objectFit: "cover" }}
                     />
@@ -91,12 +83,8 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                 </TableCell>
                 <TableCell>{post.userId?.username || "N/A"}</TableCell>
                 <TableCell>{post.content}</TableCell>
-                <TableCell>
-                  {new Date(post.createdAt).toLocaleString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(post.updatedAt).toLocaleString()}
-                </TableCell>
+                <TableCell>{new Date(post.createdAt).toLocaleString()}</TableCell>
+                <TableCell>{new Date(post.updatedAt).toLocaleString()}</TableCell>
                 <TableCell align="center">
                   <Button
                     size="small"
@@ -146,7 +134,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
               <Typography variant="subtitle2"><b>Content:</b> {selectedPost.content}</Typography>
               {selectedPost.imageUrl && (
                 <img
-                  src={getImageUrl(selectedPost.imageUrl)}
+                  src={getBackendImageUrl(selectedPost.imageUrl)}
                   alt="post"
                   style={{ width: "100%", marginTop: 16 }}
                 />
@@ -159,7 +147,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
         </DialogActions>
       </Dialog>
 
-      {/* Edit Modal with Formik & Yup */}
+      {/* Edit Modal */}
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
@@ -182,7 +170,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
               }}
               enableReinitialize
             >
-              {({ values, errors, touched, handleChange, handleBlur, isSubmitting, setFieldValue }) => (
+              {({ values, errors, touched, handleChange, handleBlur, isSubmitting }) => (
                 <Form>
                   <Typography variant="subtitle2">
                     <b>Author:</b> {selectedPost.userId?.username}
@@ -201,13 +189,12 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                     helperText={touched.content && errors.content}
                   />
 
-                  {/* Image Preview: show selected new image, else old */}
                   {(editImage || selectedPost.imageUrl) && (
                     <img
                       src={
                         editImage
                           ? URL.createObjectURL(editImage)
-                          : getImageUrl(selectedPost.imageUrl)
+                          : getBackendImageUrl(selectedPost.imageUrl)
                       }
                       alt="post"
                       style={{ width: "100%", marginTop: 16, marginBottom: 8 }}

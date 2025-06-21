@@ -4,15 +4,9 @@ import {
   Button, Paper, Avatar, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, MenuItem
 } from "@mui/material";
+import { getBackendImageUrl } from '../../utils/getBackendImageUrl';
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-
-// Helper to get backend image
-const getImageUrl = (filename) => {
-  if (!filename) return "";
-  const clean = filename.replace(/^[/\\]+/, "");
-  return `http://localhost:2000/${clean}`;
-};
 
 const EditUserSchema = Yup.object({
   username: Yup.string().required("Username is required"),
@@ -32,7 +26,6 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
   const [editingUserId, setEditingUserId] = useState(null);
   const [editImage, setEditImage] = useState(null);
 
-  // Stable: only recompute user when id changes
   const editingUser = useMemo(
     () => users.find((u) => u._id === editingUserId),
     [editingUserId, users]
@@ -72,7 +65,7 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
                   <Avatar
                     src={
                       user.profilePhoto
-                        ? getImageUrl(user.profilePhoto)
+                        ? getBackendImageUrl(user.profilePhoto)
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}`
                     }
                     alt={user.username}
@@ -188,7 +181,7 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
                       src={
                         editImage
                           ? URL.createObjectURL(editImage)
-                          : getImageUrl(editingUser.profilePhoto)
+                          : getBackendImageUrl(editingUser.profilePhoto)
                       }
                       alt="User"
                       style={{ width: "100%", marginTop: 16, marginBottom: 8 }}
