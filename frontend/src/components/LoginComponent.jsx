@@ -6,10 +6,15 @@ import { AuthContext } from "../auth/AuthProvider";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function LoginForm() {
-  const { mutate, isPending } = useLogin();
-  const { user, logout } = useContext(AuthContext);
+  const { mutate, isPending, isSuccess, data } = useLogin();
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+
 
   const validationSchema = Yup.object({
     email: Yup.string()
@@ -30,6 +35,7 @@ export default function LoginForm() {
       });
     },
   });
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-2 py-6">

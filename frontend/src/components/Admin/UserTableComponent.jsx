@@ -4,15 +4,9 @@ import {
   Button, Paper, Avatar, Dialog, DialogTitle, DialogContent,
   DialogActions, TextField, MenuItem
 } from "@mui/material";
+import { getBackendImageUrl } from '../../utils/getBackendImageUrl';
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-
-// Helper to get backend image
-const getImageUrl = (filename) => {
-  if (!filename) return "";
-  const clean = filename.replace(/^[/\\]+/, "");
-  return `http://localhost:2000/${clean}`;
-};
 
 const EditUserSchema = Yup.object({
   username: Yup.string().required("Username is required"),
@@ -32,7 +26,9 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
   const [editingUserId, setEditingUserId] = useState(null);
   const [editImage, setEditImage] = useState(null);
 
-  // Stable: only recompute user when id changes
+  const [openDelete, setOpenDelete] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
+
   const editingUser = useMemo(
     () => users.find((u) => u._id === editingUserId),
     [editingUserId, users]
@@ -72,7 +68,7 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
                   <Avatar
                     src={
                       user.profilePhoto
-                        ? getImageUrl(user.profilePhoto)
+                        ? getBackendImageUrl(user.profilePhoto)
                         : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}`
                     }
                     alt={user.username}
@@ -97,7 +93,10 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
                     variant="contained"
                     size="small"
                     color="error"
-                    onClick={() => onDelete(user)}
+                    onClick={() => {
+                      setUserToDelete(user);
+                      setOpenDelete(true);
+                    }}
                   >
                     Delete
                   </Button>
@@ -182,13 +181,12 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
                     ))}
                   </TextField>
 
-                  {/* Image preview */}
                   {(editImage || editingUser.profilePhoto) && (
                     <img
                       src={
                         editImage
                           ? URL.createObjectURL(editImage)
-                          : getImageUrl(editingUser.profilePhoto)
+                          : getBackendImageUrl(editingUser.profilePhoto)
                       }
                       alt="User"
                       style={{ width: "100%", marginTop: 16, marginBottom: 8 }}
@@ -215,6 +213,32 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
             </Formik>
           )}
         </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          Are you sure you want to delete user <strong>{userToDelete?.username}</strong>?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDelete(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={() => {
+              if (userToDelete) {
+                onDelete(userToDelete);
+                setOpenDelete(false);
+                setUserToDelete(null);
+              }
+            }}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Paper>
   );

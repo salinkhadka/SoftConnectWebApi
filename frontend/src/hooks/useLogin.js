@@ -13,12 +13,17 @@ export const useLogin = () => {
     mutationFn: loginUserService,
     mutationKey: ["login_key"],
     onSuccess: (data) => {
+      console.log("Login response:", data);
+
       const token = data?.token;
-      const user = data?.data;
+      const user = data?.data; // role is directly inside data
 
       if (token && user) {
         login(user, token);
-        navigate("/homepage", { replace: true });
+        console.log("User role =", user.role); // should now log "admin" or "normal"
+
+      } else {
+        toast.error("Invalid login response");
       }
     },
     onError: (err) => {
