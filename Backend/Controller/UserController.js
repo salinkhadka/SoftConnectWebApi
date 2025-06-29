@@ -5,16 +5,16 @@ const mongoose = require('mongoose');
 
 // Register
 exports.registerUser = async (req, res) => {
-  const { username, email, password, userId, StudentId, role, bio } = req.body;
+  const { username, email, password, StudentId, role, bio } = req.body;
   const fileName = req.file?.path;
 
-  if (!email || !password || !userId) {
+  if (!email || !password ) {
     return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
   try {
     const existingUser = await User.findOne({
-      $or: [{ username }, { email }, { userId },{StudentId}],
+      $or: [{ username }, { email },{StudentId}],
     });
 
     if (existingUser) {
@@ -26,7 +26,6 @@ exports.registerUser = async (req, res) => {
     const newUser = new User({
       username,
       email,
-      userId,
       StudentId,
       profilePhoto: fileName || '', // optional, default empty
       password: hashedPassword,
@@ -64,7 +63,7 @@ exports.loginUser = async (req, res) => {
       email: user.email,
       username: user.username,
       role: user.role,
-      userId: user.userId,
+      
     };
 
     const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "7d" });
@@ -157,3 +156,22 @@ exports.deleteOneUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+//upload image for mobileapp
+exports.uploadImage = (async (req, res, next) => {
+  // // check for the file size and send an error message
+  // if (req.file.size > process.env.MAX_FILE_UPLOAD) {
+  //   return res.status(400).send({
+  //     message: `Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`,
+  //   });
+  // }
+
+  if (!req.file) {
+    return res.status(400).send({ message: "Please upload a file" });
+  }
+  res.status(200).json({
+    success: true,
+    data: req.file.filename,
+  });
+});

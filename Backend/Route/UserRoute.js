@@ -13,4 +13,8 @@ router.get("/", authenticateUser, isAdmin, userController.getUsers); // Admin-on
 router.get("/:id", authenticateUser, userController.getOneUser);     // Logged-in user or admin
 router.put("/:id", authenticateUser,fileUpload.single('profilePhoto'), userController.updateOneUser);  // Logged-in user
 router.delete("/:id", authenticateUser, isAdmin, userController.deleteOneUser); // Admin-only
+
+router.post("/uploadImg",fileUpload.single("profilePhoto"),userController.uploadImage);
+
+
 module.exports = router;
