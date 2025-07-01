@@ -8,6 +8,7 @@ import { getBackendImageUrl } from '../../utils/getBackendImageUrl';
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 
+
 const EditUserSchema = Yup.object({
   username: Yup.string().required("Username is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),

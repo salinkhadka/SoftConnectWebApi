@@ -14,7 +14,6 @@ export default function AdminLayout() {
 
     return (
         <div className="flex h-screen font-sans bg-white">
-            {/* Sidebar */}
             <aside className="w-64 bg-[#4B2E83] text-white shadow-lg p-6 flex flex-col justify-between">
                 <div>
                     <div className="mb-10 text-center">
@@ -65,7 +64,6 @@ export default function AdminLayout() {
                     </button>
                 </header>
 
-                {/* Page Content */}
                 <main className="p-6 bg-gray-50 overflow-y-auto flex-1">
                     <Outlet />
                 </main>
