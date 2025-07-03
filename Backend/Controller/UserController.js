@@ -112,19 +112,17 @@ exports.getOneUser = async (req, res) => {
 };
 
 exports.updateOneUser = async (req, res) => {
-  // Destructure updatable fields from req.body
-  const { username, bio, role } = req.body;
-  const fileName = req.file?.path; // uploaded profile photo if any
+  const { username, email, bio, role } = req.body;
+  const fileName = req.file?.path;
 
   try {
-    // Build updateFields object with only provided fields
     const updateFields = {};
     if (username !== undefined) updateFields.username = username;
+    if (email !== undefined) updateFields.email = email;
     if (bio !== undefined) updateFields.bio = bio;
     if (role !== undefined) updateFields.role = role;
     if (fileName) updateFields.profilePhoto = fileName;
 
-    // Find and update user by id
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { $set: updateFields },
@@ -145,6 +143,7 @@ exports.updateOneUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // Delete one user
 exports.deleteOneUser = async (req, res) => {

@@ -17,7 +17,6 @@ const postSchema = new mongoose.Schema(
     },
     privacy: {
       type: String,
-    //   enum: ['public', 'friends', 'private'],
       default: 'public',
     },
     

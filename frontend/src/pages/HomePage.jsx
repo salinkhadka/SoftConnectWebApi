@@ -1,28 +1,36 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
-  FiHome,
-  FiUser,
-  FiMessageCircle,
-  FiBell,
-  FiPlusCircle,
-  FiUsers,
-  FiMoreHorizontal,
-  FiLogOut
+  FiHome, FiUser, FiMessageCircle, FiBell,
+  FiPlusCircle, FiUsers, FiMoreHorizontal, FiLogOut
 } from 'react-icons/fi';
-import logo from '../assets/logo.png'; // Update path if needed
+import logo from '../assets/logo.png';
+import { AuthContext } from "../auth/AuthProvider";
+import { useContext } from "react";
+import { Modal, Box, IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
+import AddPostComponent from '../components/Admin/AddPost'; // adjust path as needed
 
 // Color Palette
 const PURPLE = '#37225C';
 const LAVENDER = '#B8A6E6';
 const WHITE = '#FFFFFF';
 
+
+
 export default function HomePage() {
   const navigate = useNavigate();
   const [showMore, setShowMore] = useState(false);
-  const [theme, setTheme] = useState(
-    localStorage.getItem('theme') === 'dark' ? 'dark' : 'light'
-  );
+  const { user, logout } = useContext(AuthContext);
+  const [openCreateModal, setOpenCreateModal] = useState(false);
+
+
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('theme');
+    if (saved) return saved;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
+
   const moreRef = useRef(null);
 
   useEffect(() => {
@@ -35,7 +43,7 @@ export default function HomePage() {
     }
   }, [navigate]);
 
-  // Close popup if click outside
+  // Close "more" popup on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (moreRef.current && !moreRef.current.contains(event.target)) {
@@ -43,25 +51,24 @@ export default function HomePage() {
       }
     }
     if (showMore) document.addEventListener("mousedown", handleClickOutside);
-    else document.removeEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMore]);
 
-  // Handle theme switch
+  // ✅ Apply theme class and persist to localStorage
   useEffect(() => {
-    if (theme === "dark") document.documentElement.classList.add("dark");
-    else document.documentElement.classList.remove("dark");
-    localStorage.setItem('theme', theme);
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme);
   }, [theme]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
 
   const toggleTheme = () => {
     setTheme(prev => (prev === "dark" ? "light" : "dark"));
   };
+
+  const handleLogout = () => {
+    logout(); // from AuthContext
+    navigate("/login");
+  };
+
 
   const linkStyle = ({ isActive }) =>
     `flex items-center gap-4 px-4 py-3 rounded-lg transition-all text-xl font-medium
@@ -71,7 +78,7 @@ export default function HomePage() {
     }`;
 
   return (
-    <div className="flex h-screen bg-white font-sans overflow-hidden">
+    <div className="flex h-screen bg-white dark:bg-[#121018] text-black dark:text-white font-sans overflow-hidden transition-colors duration-500">
       {/* Sidebar */}
       <aside
         className="w-64 hidden sm:flex flex-col justify-between p-4"
@@ -81,7 +88,7 @@ export default function HomePage() {
         }}
       >
         <div>
-          {/* Logo & SoftConnect tag */}
+          {/* Logo & Title */}
           <div className="flex flex-col items-center mb-10">
             <img
               src={logo}
@@ -97,31 +104,37 @@ export default function HomePage() {
 
           {/* Navigation */}
           <nav className="flex flex-col space-y-3">
-            <NavLink to="/homepage/feed" className={linkStyle}>
+            <NavLink to="/feed" className={linkStyle}>
               <FiHome size={28} />
               <span>Home</span>
             </NavLink>
-            <NavLink to="/homepage/friends" className={linkStyle}>
+            <NavLink to="/friends" className={linkStyle}>
               <FiUsers size={28} />
               <span>Friends</span>
             </NavLink>
-            <NavLink to="/homepage/messages" className={linkStyle}>
+            <NavLink to="/messages" className={linkStyle}>
               <FiMessageCircle size={28} />
               <span>Messages</span>
             </NavLink>
-            <NavLink to="/homepage/notifications" className={linkStyle}>
+            <NavLink to="/notifications" className={linkStyle}>
               <FiBell size={28} />
               <span>Notifications</span>
             </NavLink>
-            <NavLink to="/homepage/create" className={linkStyle}>
+            <button
+              className={linkStyle({ isActive: false })}
+              onClick={() => setOpenCreateModal(true)}
+              type="button"
+            >
               <FiPlusCircle size={28} />
               <span>Create</span>
-            </NavLink>
-            <NavLink to="/homepage/profile" className={linkStyle}>
+            </button>
+
+            <NavLink to="/profile" className={linkStyle}>
               <FiUser size={28} />
               <span>Profile</span>
             </NavLink>
-            {/* More Button and Popup */}
+
+            {/* More Options */}
             <div className="relative flex flex-col items-center" ref={moreRef}>
               <button
                 aria-label="More"
@@ -137,7 +150,7 @@ export default function HomePage() {
                 <div
                   className="absolute w-64 left-2 bottom-16 bg-white dark:bg-[#37225C] rounded-2xl shadow-2xl border border-gray-100 dark:border-[#271d40] z-50 p-4"
                 >
-                  {/* Dark Mode Toggle Row */}
+                  {/* Dark Mode Toggle */}
                   <div className="flex items-center justify-between py-2">
                     <span className="text-gray-800 dark:text-[#B8A6E6] font-medium">Dark mode</span>
                     <button
@@ -174,15 +187,53 @@ export default function HomePage() {
 
         {/* Footer */}
         <div className="text-xs text-center mt-6 mb-2">
+
           <span style={{ color: LAVENDER, fontWeight: 700 }}>Soft</span>
           <span style={{ color: WHITE, fontWeight: 700 }}>Connect</span>
+          @2025
         </div>
       </aside>
+      <Modal
+        open={openCreateModal}
+        onClose={() => setOpenCreateModal(false)}
+        aria-labelledby="create-post-modal"
+        aria-describedby="create-post-form"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 700,
+            maxWidth: '95%',
+            bgcolor: 'background.paper',
+            boxShadow: 24,
+            borderRadius: 3,
+            p: 3,
+            outline: 'none',
+          }}
+        >
+          {/* Close Button */}
+          <IconButton
+            onClick={() => setOpenCreateModal(false)}
+            sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.600' }}
+            aria-label="close"
+          >
+            <CloseIcon />
+          </IconButton>
+
+          <AddPostComponent />
+        </Box>
+      </Modal>
+
+
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-[#121018]">
+      <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-[#121018] transition-colors duration-500">
         <Outlet />
       </main>
+
     </div>
   );
 }

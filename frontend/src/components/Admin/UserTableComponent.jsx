@@ -26,7 +26,6 @@ export default function UserTableComponent({ users, onUpdate, onDelete }) {
   const [openEdit, setOpenEdit] = useState(false);
   const [editingUserId, setEditingUserId] = useState(null);
   const [editImage, setEditImage] = useState(null);
-
   const [openDelete, setOpenDelete] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 

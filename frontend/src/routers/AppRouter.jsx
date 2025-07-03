@@ -11,6 +11,9 @@ import NormalUserRoute from './NormalUserRoute';
 import PostPageAdmin from '../pages/Admin/PostPageAdmin';
 import AddPostComponent from '../components/Admin/AddPost';
 import UserPageAdmin from '../pages/Admin/UserPageAdmin';
+import FeedComponent from '../components/FeedComponent';
+import ProfileHeader from '../components/ProfileHeader';
+import MyProfileSection from '../pages/ProfilePage';
 
 export default function AppRouter() {
   return (
@@ -25,26 +28,32 @@ export default function AppRouter() {
           </Route>
         </Route>
 
-        {/* Normal Logged-in User Routes */}
+        {/* Normal User Routes */}
         <Route element={<NormalUserRoute />}>
           <Route element={<UserLayout />}>
-            <Route path="/homepage" element={<HomePage />} />
-            {/* Add more normal-user accessible routes here */}
+            <Route path="/" element={<HomePage />}>
+              <Route index element={<div>Welcome User</div>} />
+              <Route path="feed" element={<FeedComponent />} />
+              <Route path="profile" element={<MyProfileSection />} />
+
+              {/* Add other subroutes like messages, profile, etc. */}
+            </Route>
           </Route>
         </Route>
 
+        {/* Admin Routes */}
         <Route element={<AdminUserRoute />}>
-          <Route path="/admin" element={<AdminLayout/>}>
+          <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<div>Welcome to Admin Dashboard</div>} />
             <Route path="users" element={<UserPageAdmin />} />
             <Route path="posts" element={<PostPageAdmin />} />
             <Route path="addPost" element={<AddPostComponent />} />
-            <Route path="*" element={<>Admin Page Not Found</>} />
+            <Route path="*" element={<div>Admin Page Not Found</div>} />
           </Route>
         </Route>
 
-
-        <Route path="*" element={<HomePage/>} />
+        {/* Fallback */}
+        <Route path="*" element={<div>404 Page Not Found</div>} />
 
       </Routes>
     </BrowserRouter>

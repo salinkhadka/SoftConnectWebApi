@@ -34,7 +34,6 @@ export const useUser = (id) =>
 // Update user
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { user: currentUser, login } = useContext(AuthContext); // Get current user from context
 
   return useMutation({
