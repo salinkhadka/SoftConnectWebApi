@@ -4,7 +4,7 @@ import {
   getPostCommentsService,
   createCommentService,
   deleteCommentService,
-} from "../services/commentService"; // adjust path if needed
+} from "../services/commentService";
 
 // Fetch comments of a post
 export const usePostComments = (postId) =>
@@ -22,11 +22,14 @@ export const useCreateComment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ postId, comment }) => createCommentService(postId, comment),
+    mutationFn: (commentData) => createCommentService(commentData),
     mutationKey: ["create_comment"],
     onSuccess: (_, variables) => {
       toast.success("Comment added!");
-      queryClient.invalidateQueries(["post_comments", variables.postId]);
+      // Invalidate query for comments of the specific post to refresh comment list
+      if (variables?.postId) {
+        queryClient.invalidateQueries(["post_comments", variables.postId]);
+      }
     },
     onError: (err) => {
       toast.error(err?.message || "Failed to add comment");
@@ -43,7 +46,7 @@ export const useDeleteComment = () => {
     mutationKey: ["delete_comment"],
     onSuccess: (_, commentId) => {
       toast.success("Comment deleted!");
-      // If you want, you can invalidate all post comments or find the postId for targeted invalidation
+      // Invalidate all post_comments queries to refresh comments (better to be more specific if possible)
       queryClient.invalidateQueries({ queryKey: ["post_comments"] });
     },
     onError: (err) => {

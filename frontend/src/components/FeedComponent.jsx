@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { useAllPosts } from "../hooks/Admin/getAllPosts";
+import { usePostComments } from "../hooks/usecommenthook";
 import LikeButton from "../components/LikeButton";
 import { FiMessageCircle, FiLock, FiUsers, FiGlobe } from "react-icons/fi";
 import { getBackendImageUrl } from "../utils/getBackendImageUrl";
@@ -45,10 +46,7 @@ function formatFacebookDate(dateStr) {
   });
 }
 
-// PostCard component
 function PostCard({ post, openModal }) {
-  const { user, isAuthenticated } = useContext(AuthContext);
-
   const { icon, label } = getPrivacyIcon(post.privacy);
   const username = post.userId?.username || "Unknown User";
   const profilePhoto =
@@ -58,9 +56,12 @@ function PostCard({ post, openModal }) {
   const createdAt = formatFacebookDate(post.createdAt);
   const hasImage = post.imageUrl && post.imageUrl.trim() !== "";
 
+  // Fetch comments count
+  const { data: commentsResponse, isLoading: commentsLoading } = usePostComments(post._id);
+  const commentCount = commentsResponse?.data?.length || 0;
+
   return (
     <div
-      key={post._id}
       className="bg-white dark:bg-[#1e1b29] rounded-2xl shadow p-4 mb-6 border border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-[#232137] transition"
       onClick={(e) => {
         if (
@@ -94,7 +95,7 @@ function PostCard({ post, openModal }) {
         </div>
       </div>
 
-      {/* Post Content */}
+      {/* Content */}
       <div className="text-lg text-gray-900 dark:text-gray-100 whitespace-pre-line mb-2">
         {post.content}
       </div>
@@ -114,23 +115,25 @@ function PostCard({ post, openModal }) {
       {/* Action Buttons */}
       <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
         <LikeButton postId={post._id} />
-
         <button
           className="flex items-center gap-1 text-gray-600 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 py-2 px-4 rounded-md transition-colors"
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => {
+            e.stopPropagation();
+            openModal(post);
+          }}
         >
           <FiMessageCircle size={18} />
-          Comment
+          <span>
+            {commentsLoading ? "..." : commentCount} Comment{commentCount !== 1 ? "s" : ""}
+          </span>
         </button>
       </div>
     </div>
   );
 }
 
-// FeedComponent
 export default function FeedComponent() {
   const { data, isLoading, isError } = useAllPosts();
-
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
 
@@ -152,7 +155,9 @@ export default function FeedComponent() {
       {data?.data?.map((post) => (
         <PostCard key={post._id} post={post} openModal={openModal} />
       ))}
-      <PostModal isOpen={modalOpen} onClose={closeModal} post={selectedPost} />
+      {selectedPost && (
+        <PostModal isOpen={modalOpen} onClose={closeModal} post={selectedPost} />
+      )}
     </div>
   );
 }

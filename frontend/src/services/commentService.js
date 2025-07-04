@@ -15,10 +15,11 @@ export const getPostCommentsService = async (postId) => {
   }
 };
 
-// Add a new comment
-export const createCommentService = async (postId, comment) => {
+// Add a new comment or reply
+// Expects a single object: { userId, postId, content, parentCommentId (optional) }
+export const createCommentService = async (commentData) => {
   try {
-    const response = await createComment(postId, comment);
+    const response = await createComment(commentData);
     return response.data;
   } catch (err) {
     console.error(err);
