@@ -1,8 +1,17 @@
-import React from 'react';
-import { FiX, FiThumbsUp, FiMessageCircle, FiLock, FiUsers, FiGlobe } from 'react-icons/fi';
+import React, { useContext } from 'react';
+import {
+  FiX,
+  FiMessageCircle,
+  FiLock,
+  FiUsers,
+  FiGlobe,
+} from 'react-icons/fi';
 import { getBackendImageUrl } from '../utils/getBackendImageUrl';
+import { AuthContext } from '../auth/AuthProvider';
+import LikeButton from '../components/LikeButton';
 
-const DEFAULT_AVATAR = 'https://ui-avatars.com/api/?background=ddd&color=888&name=U';
+const DEFAULT_AVATAR =
+  'https://ui-avatars.com/api/?background=ddd&color=888&name=U';
 
 const getPrivacyIcon = (privacy) => {
   switch (privacy) {
@@ -26,7 +35,11 @@ function formatFacebookDate(dateStr) {
     date.getMonth() === now.getMonth() &&
     date.getFullYear() === now.getFullYear()
   ) {
-    return date.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+    return date.toLocaleString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
   }
   return date.toLocaleString('en-US', {
     month: 'long',
@@ -38,24 +51,28 @@ function formatFacebookDate(dateStr) {
 }
 
 export default function PostModal({ isOpen, onClose, post }) {
-  if (!isOpen) return null;
+  const { user } = useContext(AuthContext);
+
+  if (!isOpen || !post) return null;
 
   const {
-    userId = {},
+    userId: postUser = {},
     content = '',
     imageUrl = '',
     privacy = 'public',
     createdAt,
-  } = post || {};
+    _id: postId,
+  } = post;
 
   const { icon, label } = getPrivacyIcon(privacy);
-  const username = userId?.username || 'Unknown User';
+  const username = postUser?.username || 'Unknown User';
   const profilePhoto =
-    userId?.profilePhoto && userId.profilePhoto.trim() !== ''
-      ? getBackendImageUrl(userId.profilePhoto)
+    postUser?.profilePhoto && postUser.profilePhoto.trim() !== ''
+      ? getBackendImageUrl(postUser.profilePhoto)
       : DEFAULT_AVATAR;
   const dateStr = formatFacebookDate(createdAt);
-  const postImage = imageUrl && imageUrl.trim() !== '' ? getBackendImageUrl(imageUrl) : '';
+  const postImage =
+    imageUrl && imageUrl.trim() !== '' ? getBackendImageUrl(imageUrl) : '';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
@@ -79,7 +96,9 @@ export default function PostModal({ isOpen, onClose, post }) {
             />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-gray-900 dark:text-white">{username}</span>
+                <span className="font-semibold text-gray-900 dark:text-white">
+                  {username}
+                </span>
               </div>
               <div className="flex items-center text-xs text-gray-500 dark:text-gray-300 gap-1">
                 <span>{dateStr}</span>
@@ -103,17 +122,14 @@ export default function PostModal({ isOpen, onClose, post }) {
               src={postImage}
               alt="Post"
               className="w-full max-h-[520px] object-contain rounded-b-2xl"
-              style={{ background: "#17171a" }}
+              style={{ background: '#17171a' }}
             />
           </div>
         )}
 
         {/* Action Bar */}
         <div className="flex items-center justify-between px-8 mt-2 py-3 border-t border-gray-200 dark:border-gray-700">
-          <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-100">
-            <FiThumbsUp size={20} />
-            <span>Like</span>
-          </button>
+          <LikeButton postId={postId} />
           <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-100">
             <FiMessageCircle size={20} />
             <span>Comment</span>

@@ -4,7 +4,6 @@ import {
   FiLock,
   FiUsers,
   FiGlobe,
-  FiThumbsUp,
   FiMessageCircle,
   FiTrash2,
   FiEdit2,
@@ -19,6 +18,7 @@ import TextField from "@mui/material/TextField";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import DeleteModal from "../components/DeleteModal";
+import LikeButton from "../components/LikeButton";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
@@ -110,15 +110,13 @@ export default function UserPostsGrid({
         }
       />
 
-      {/* Edit Modal (MUI + Formik) */}
+      {/* Edit Modal */}
       <Dialog open={editOpen} onClose={() => setEditOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Post</DialogTitle>
         <DialogContent>
           {selectedPost && (
             <Formik
-              initialValues={{
-                content: selectedPost.content,
-              }}
+              initialValues={{ content: selectedPost.content }}
               validationSchema={EditSchema}
               onSubmit={(values, { setSubmitting }) => {
                 const formData = new FormData();
@@ -174,6 +172,7 @@ export default function UserPostsGrid({
                     }}
                     style={{ marginTop: 8 }}
                   />
+
                   <DialogActions>
                     <Button onClick={() => {
                       setEditOpen(false);
@@ -192,12 +191,11 @@ export default function UserPostsGrid({
         </DialogContent>
       </Dialog>
 
-      {/* The grid */}
+      {/* Post Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10 px-4">
         {posts.map((post) => {
           const { icon, label } = getPrivacyIcon(post.privacy);
-          const username =
-            user?.username || post.userId?.username || "Unknown User";
+          const username = post.userId?.username || user?.username || "Unknown User";
           const profilePhoto =
             user?.profilePhoto && user.profilePhoto.trim() !== ""
               ? getBackendImageUrl(user.profilePhoto)
@@ -235,6 +233,7 @@ export default function UserPostsGrid({
                   <FiTrash2 size={18} />
                 </button>
               </div>
+
               {/* User Info */}
               <div className="flex items-center mb-2 gap-3">
                 <img
@@ -244,9 +243,7 @@ export default function UserPostsGrid({
                 />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900 dark:text-white">
-                      {username}
-                    </span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{username}</span>
                   </div>
                   <div className="flex items-center text-xs text-gray-500 dark:text-gray-300 gap-1">
                     <span>{createdAt}</span>
@@ -262,7 +259,7 @@ export default function UserPostsGrid({
                 {post.content}
               </div>
 
-              {/* Image (if any) */}
+              {/* Image */}
               {post.imageUrl && (
                 <div className="overflow-hidden rounded-xl mb-2 bg-black flex items-center justify-center w-full aspect-square">
                   <img
@@ -275,12 +272,12 @@ export default function UserPostsGrid({
 
               {/* Like/Comment Actions */}
               <div className="flex justify-between items-center mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
-                <button
-                  className="flex items-center gap-1 text-gray-600 hover:text-blue-600 dark:text-gray-200 py-2 px-3 rounded transition"
+                <div
+                  className="py-2 px-3"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <FiThumbsUp size={17} /> Like
-                </button>
+                  <LikeButton postId={post._id} />
+                </div>
                 <button
                   className="flex items-center gap-1 text-gray-600 hover:text-blue-600 dark:text-gray-200 py-2 px-3 rounded transition"
                   onClick={(e) => e.stopPropagation()}
