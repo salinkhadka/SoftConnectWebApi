@@ -80,19 +80,47 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// Get all users
+
+
 exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    const { page = 1, limit = 2, search = "" } = req.query;
+    const filter = {};
+
+    if (search) {
+      filter.$or = [
+        { username: { $regex: search, $options: "i" } },
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    const skip = (page - 1) * limit;
+
+    const users = await User.find(filter)
+      .select("username email profilePhoto") // Only return needed fields
+      .skip(skip)
+      .limit(Number(limit));
+
+    const total = await User.countDocuments(filter);
+
     return res.status(200).json({
       success: true,
       message: "Users fetched successfully",
       data: users,
+      pagination: {
+        total,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(total / limit),
+      },
     });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // Get one user
 exports.getOneUser = async (req, res) => {

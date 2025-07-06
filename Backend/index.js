@@ -8,6 +8,8 @@ const userRoutes = require('./Route/UserRoute');
 const postRoutes = require('./Route/PostRoute');
 const likeRoutes = require('./Route/LikeRoute');         // ✅ New
 const commentRoutes = require('./Route/CommentRoute');   // ✅ New
+const notificationRoute = require('./Route/NotificationRoute');
+const friendsRoute = require('./Route/FriendsRoute');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,8 +25,10 @@ app.use(express.json());
 // API Routes
 app.use("/user", userRoutes);
 app.use("/post", postRoutes);
-app.use("/like", likeRoutes);           // ✅ New
-app.use("/comment", commentRoutes);     // ✅ New
+app.use("/like", likeRoutes);          
+app.use("/comment", commentRoutes); 
+app.use("/notifications", notificationRoute); 
+app.use("/friends",friendsRoute) 
 
 // Test Route
 app.get('/hey', (req, res) => {

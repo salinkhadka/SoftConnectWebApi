@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
+import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../auth/AuthProvider"; // Uncomment this!
@@ -10,17 +11,20 @@ import {
   deleteUserService,
 } from "../../services/authService";
 
-// Get all users (admin only)
-export const useAllUsers = () =>
-  useQuery({
-    queryKey: ["all_users"],
-    queryFn: getAllUsersService,
-    onError: (err) => {
-      toast.error(err?.message || "Failed to load users");
-    },
-  });
 
-// Get one user
+import { useEffect } from 'react';
+
+export const useGetUsers = ({ search }) => {
+  return useQuery({
+    queryKey: ["admin-users", search],
+    queryFn: () => getAllUsersService({ page: 1, limit: 10, search }),
+    enabled: search.trim().length > 0, // don't fetch if search is empty
+    keepPreviousData: true,
+  });
+};
+
+
+
 export const useUser = (id) =>
   useQuery({
     queryKey: ["user", id],

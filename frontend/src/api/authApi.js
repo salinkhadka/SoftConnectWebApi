@@ -13,13 +13,8 @@ export const loginUserApi = (data) =>
   axios.post("user/login", data);
 
 // Get all users (admin only, token required)
-export const getAllUsersApi = () => {
-  const token = localStorage.getItem("token");
-  return axios.get("user/", {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
+export const getAllUsersApi = (params) => {
+  return axios.get("user/getAll", { params });
 };
 
 // Get one user by ID (token required)

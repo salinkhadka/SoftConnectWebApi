@@ -1,30 +1,27 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import {
   FiHome, FiUser, FiMessageCircle, FiBell,
-  FiPlusCircle, FiUsers, FiMoreHorizontal, FiLogOut
+  FiPlusCircle, FiUsers, FiMoreHorizontal, FiLogOut,
+  FiSearch,
 } from 'react-icons/fi';
-import logo from '../assets/logo.png';
-import { AuthContext } from "../auth/AuthProvider";
-import { useContext } from "react";
-import { Modal, Box, IconButton } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import AddPostComponent from '../components/Admin/AddPost'; // adjust path as needed
 
-// Color Palette
+import logo from '../assets/logo.png';
+import { AuthContext } from '../auth/AuthProvider';
+
+import AddPostModal from '../components/AddPostModal';
+import SearchPanel from '../components/SearchModal';
+
 const PURPLE = '#37225C';
 const LAVENDER = '#B8A6E6';
 const WHITE = '#FFFFFF';
-
-
 
 export default function HomePage() {
   const navigate = useNavigate();
   const [showMore, setShowMore] = useState(false);
   const { user, logout } = useContext(AuthContext);
   const [openCreateModal, setOpenCreateModal] = useState(false);
-
-
+  const [openSearchPanel, setOpenSearchPanel] = useState(false);
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem('theme');
     if (saved) return saved;
@@ -34,41 +31,38 @@ export default function HomePage() {
   const moreRef = useRef(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    const storedUser = localStorage.getItem('user');
     if (storedUser) {
       const user = JSON.parse(storedUser);
-      if (user.role === "admin") {
-        navigate("/admin", { replace: true });
+      if (user.role === 'admin') {
+        navigate('/admin', { replace: true });
       }
     }
   }, [navigate]);
 
-  // Close "more" popup on outside click
   useEffect(() => {
     function handleClickOutside(event) {
       if (moreRef.current && !moreRef.current.contains(event.target)) {
         setShowMore(false);
       }
     }
-    if (showMore) document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    if (showMore) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showMore]);
 
-  // ✅ Apply theme class and persist to localStorage
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("theme", theme);
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === "dark" ? "light" : "dark"));
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
   const handleLogout = () => {
-    logout(); // from AuthContext
-    navigate("/login");
+    logout();
+    navigate('/login');
   };
-
 
   const linkStyle = ({ isActive }) =>
     `flex items-center gap-4 px-4 py-3 rounded-lg transition-all text-xl font-medium
@@ -81,7 +75,7 @@ export default function HomePage() {
     <div className="flex h-screen bg-white dark:bg-[#121018] text-black dark:text-white font-sans overflow-hidden transition-colors duration-500">
       {/* Sidebar */}
       <aside
-        className="w-64 hidden sm:flex flex-col justify-between p-4"
+        className="w-[23%] hidden sm:flex flex-col justify-between p-4"
         style={{
           background: PURPLE,
           borderRight: '2px solid #ede9fe',
@@ -96,7 +90,7 @@ export default function HomePage() {
               className="h-48 w-48 rounded-full object-cover shadow-md"
               style={{ border: `3px solid ${LAVENDER}` }}
             />
-            <div className="mt-3 text-3xl font-extrabold text-center" style={{ textShadow: "0 2px 10px #20153b" }}>
+            <div className="mt-3 text-3xl font-extrabold text-center" style={{ textShadow: '0 2px 10px #20153b' }}>
               <span style={{ color: LAVENDER }}>Soft</span>
               <span style={{ color: WHITE }}>Connect</span>
             </div>
@@ -104,6 +98,13 @@ export default function HomePage() {
 
           {/* Navigation */}
           <nav className="flex flex-col space-y-3">
+            <button
+              className={linkStyle({ isActive: false })}
+              onClick={() => setOpenSearchPanel(true)}
+            >
+              <FiSearch size={28} />
+              <span>Search</span>
+            </button>
             <NavLink to="/feed" className={linkStyle}>
               <FiHome size={28} />
               <span>Home</span>
@@ -128,7 +129,6 @@ export default function HomePage() {
               <FiPlusCircle size={28} />
               <span>Create</span>
             </button>
-
             <NavLink to="/profile" className={linkStyle}>
               <FiUser size={28} />
               <span>Profile</span>
@@ -140,7 +140,7 @@ export default function HomePage() {
                 aria-label="More"
                 className={`${linkStyle({ isActive: false })} w-full justify-start`}
                 onClick={() => setShowMore((v) => !v)}
-                style={{ boxShadow: "none" }}
+                style={{ boxShadow: 'none' }}
                 type="button"
               >
                 <FiMoreHorizontal size={28} />
@@ -155,18 +155,13 @@ export default function HomePage() {
                     <span className="text-gray-800 dark:text-[#B8A6E6] font-medium">Dark mode</span>
                     <button
                       onClick={toggleTheme}
-                      className={`
-                        w-12 h-7 flex items-center rounded-full p-1
-                        transition-colors duration-300
-                        ${theme === "dark" ? "bg-[#4A317C]" : "bg-gray-300"}
-                      `}
+                      className={`w-12 h-7 flex items-center rounded-full p-1 transition-colors duration-300
+                        ${theme === 'dark' ? 'bg-[#4A317C]' : 'bg-gray-300'}`}
                       aria-label="Toggle dark mode"
                     >
                       <div
-                        className={`
-                          w-5 h-5 bg-white rounded-full shadow-md transform duration-300
-                          ${theme === "dark" ? "translate-x-5" : ""}
-                        `}
+                        className={`w-5 h-5 bg-white rounded-full shadow-md transform duration-300
+                          ${theme === 'dark' ? 'translate-x-5' : ''}`}
                       ></div>
                     </button>
                   </div>
@@ -187,53 +182,20 @@ export default function HomePage() {
 
         {/* Footer */}
         <div className="text-xs text-center mt-6 mb-2">
-
           <span style={{ color: LAVENDER, fontWeight: 700 }}>Soft</span>
           <span style={{ color: WHITE, fontWeight: 700 }}>Connect</span>
           @2025
         </div>
       </aside>
-      <Modal
-        open={openCreateModal}
-        onClose={() => setOpenCreateModal(false)}
-        aria-labelledby="create-post-modal"
-        aria-describedby="create-post-form"
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: 700,
-            maxWidth: '95%',
-            bgcolor: 'background.paper',
-            boxShadow: 24,
-            borderRadius: 3,
-            p: 3,
-            outline: 'none',
-          }}
-        >
-          {/* Close Button */}
-          <IconButton
-            onClick={() => setOpenCreateModal(false)}
-            sx={{ position: 'absolute', top: 8, right: 8, color: 'grey.600' }}
-            aria-label="close"
-          >
-            <CloseIcon />
-          </IconButton>
 
-          <AddPostComponent />
-        </Box>
-      </Modal>
+      {/* Modals */}
+      <AddPostModal open={openCreateModal} onClose={() => setOpenCreateModal(false)} />
+      <SearchPanel open={openSearchPanel} onClose={() => setOpenSearchPanel(false)} />
 
-
-
-      {/* Main Content */}
+      {/* Main Content Outlet */}
       <main className="flex-1 overflow-y-auto p-6 bg-gray-50 dark:bg-[#121018] transition-colors duration-500">
         <Outlet />
       </main>
-
     </div>
   );
 }

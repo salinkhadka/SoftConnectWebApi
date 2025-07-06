@@ -11,7 +11,7 @@ function NormalUserRoute() {
     if (!user) return <Navigate to="/login" replace />
     //replace will note save history
     console.log("Logged", user)
-    if (user.role === "normal") return <Navigate to="/admin" replace />
+    // if (user.role === "normal") return <Navigate to="/admin" replace />
 
     
     return <Outlet />

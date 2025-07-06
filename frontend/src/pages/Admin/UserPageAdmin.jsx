@@ -1,9 +1,9 @@
 import React from "react";
 import UserTableComponent from "../../components/Admin/UserTableComponent";
-import { useAllUsers, useDeleteUser, useUpdateUser } from "../../hooks/Admin/adminUserhook";
+import { useGetUsers, useDeleteUser, useUpdateUser } from "../../hooks/Admin/adminUserhook";
 
 export default function UserPageAdmin() {
-  const { data, isLoading, isError } = useAllUsers();
+  const { data, isLoading, isError } = useGetUsers();
   const deleteUser = useDeleteUser();
   const updateUser = useUpdateUser();
 

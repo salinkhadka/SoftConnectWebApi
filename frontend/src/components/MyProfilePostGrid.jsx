@@ -7,6 +7,7 @@ import {
   FiMessageCircle,
   FiTrash2,
   FiEdit2,
+  FiX,
 } from "react-icons/fi";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -19,6 +20,10 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import DeleteModal from "../components/DeleteModal";
 import LikeButton from "../components/LikeButton";
+import CommentCount from "./CommentButton";
+
+// Import the new modal component for full post + comments
+import PostModalStandalone from "../components/PostModalStandalone";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
@@ -63,17 +68,15 @@ const EditSchema = Yup.object({
   content: Yup.string().required("Content is required"),
 });
 
-export default function UserPostsGrid({
-  posts,
-  user,
-  onPostClick,
-  onDelete,
-  onUpdate,
-}) {
+export default function UserPostsGrid({ posts, user, onDelete, onUpdate }) {
   const [editOpen, setEditOpen] = useState(false);
   const [editImage, setEditImage] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+
+  // New state for post modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalPost, setModalPost] = useState(null);
 
   const handleEdit = (post) => {
     setSelectedPost(post);
@@ -90,6 +93,18 @@ export default function UserPostsGrid({
     onDelete(deleteId);
     setDeleteId(null);
     setSelectedPost(null);
+  };
+
+  // Open post modal on card click
+  const openPostModal = (post) => {
+    setModalPost(post);
+    setModalOpen(true);
+  };
+
+  // Close post modal
+  const closePostModal = () => {
+    setModalPost(null);
+    setModalOpen(false);
   };
 
   if (!posts || posts.length === 0)
@@ -174,10 +189,12 @@ export default function UserPostsGrid({
                   />
 
                   <DialogActions>
-                    <Button onClick={() => {
-                      setEditOpen(false);
-                      setEditImage(null);
-                    }}>
+                    <Button
+                      onClick={() => {
+                        setEditOpen(false);
+                        setEditImage(null);
+                      }}
+                    >
                       Cancel
                     </Button>
                     <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
@@ -190,6 +207,9 @@ export default function UserPostsGrid({
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Post Modal */}
+      <PostModalStandalone post={modalPost} isOpen={modalOpen} onClose={closePostModal} />
 
       {/* Post Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-10 px-4">
@@ -208,7 +228,7 @@ export default function UserPostsGrid({
             <div
               key={post._id}
               className="bg-white dark:bg-[#1e1b29] rounded-2xl shadow p-4 flex flex-col border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow group relative"
-              onClick={() => onPostClick && onPostClick(post)}
+              onClick={() => openPostModal(post)} // OPEN modal here on card click
             >
               {/* Edit/Delete Buttons */}
               <div className="absolute top-3 right-3 flex gap-2 z-10 opacity-60 group-hover:opacity-100 transition">
@@ -278,12 +298,9 @@ export default function UserPostsGrid({
                 >
                   <LikeButton postId={post._id} />
                 </div>
-                <button
-                  className="flex items-center gap-1 text-gray-600 hover:text-blue-600 dark:text-gray-200 py-2 px-3 rounded transition"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <FiMessageCircle size={17} /> Comment
-                </button>
+                <div onClick={(e) => e.stopPropagation()}>
+    <CommentCount postId={post._id} openPostModal={() => openPostModal(post)} />
+  </div>
               </div>
             </div>
           );

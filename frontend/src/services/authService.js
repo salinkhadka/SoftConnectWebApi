@@ -29,16 +29,16 @@ export const loginUserService = async (formData) => {
   }
 };
 
-// Get all users (admin only)
-export const getAllUsersService = async () => {
+export const getAllUsersService = async (params) => {
   try {
-    const response = await getAllUsersApi();
+    const response = await getAllUsersApi(params);
     return response.data;
   } catch (err) {
     console.error(err);
-    throw err.response?.data || { message: "Failed to fetch users" };
+    throw err.response?.data || { message: "User fetch failed" };
   }
 };
+
 
 // Get one user
 export const getUserByIdService = async (id) => {

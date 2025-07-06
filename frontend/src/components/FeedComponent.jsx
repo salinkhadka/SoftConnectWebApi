@@ -6,6 +6,7 @@ import { FiMessageCircle, FiLock, FiUsers, FiGlobe } from "react-icons/fi";
 import { getBackendImageUrl } from "../utils/getBackendImageUrl";
 import { AuthContext } from "../auth/AuthProvider";
 import PostModal from "./ViewPostInFeed";
+import CommentCount from "./CommentButton";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
@@ -56,9 +57,6 @@ function PostCard({ post, openModal }) {
   const createdAt = formatFacebookDate(post.createdAt);
   const hasImage = post.imageUrl && post.imageUrl.trim() !== "";
 
-  // Fetch comments count
-  const { data: commentsResponse, isLoading: commentsLoading } = usePostComments(post._id);
-  const commentCount = commentsResponse?.data?.length || 0;
 
   return (
     <div
@@ -115,18 +113,7 @@ function PostCard({ post, openModal }) {
       {/* Action Buttons */}
       <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
         <LikeButton postId={post._id} />
-        <button
-          className="flex items-center gap-1 text-gray-600 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 py-2 px-4 rounded-md transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            openModal(post);
-          }}
-        >
-          <FiMessageCircle size={18} />
-          <span>
-            {commentsLoading ? "..." : commentCount} Comment{commentCount !== 1 ? "s" : ""}
-          </span>
-        </button>
+        <CommentCount postId={post._id} openPostModal={() => openModal(post)} />
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import FeedComponent from '../components/FeedComponent';
 import ProfileHeader from '../components/ProfileHeader';
 import MyProfileSection from '../pages/ProfilePage';
 
+
 export default function AppRouter() {
   return (
     <BrowserRouter>
@@ -32,9 +33,10 @@ export default function AppRouter() {
         <Route element={<NormalUserRoute />}>
           <Route element={<UserLayout />}>
             <Route path="/" element={<HomePage />}>
-              <Route index element={<div>Welcome User</div>} />
+              <Route index element={<FeedComponent/>} />
               <Route path="feed" element={<FeedComponent />} />
               <Route path="profile" element={<MyProfileSection />} />
+              <Route path="/:userid" element={<>userprofile</>}/>
 
               {/* Add other subroutes like messages, profile, etc. */}
             </Route>

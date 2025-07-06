@@ -7,12 +7,12 @@ import DeleteModal from "./DeleteModal";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
-export default function CommentCard({ comment, allComments, postId, onReplyPosted }) {
+export default function CommentCard({ comment, allComments, postId, postOwnerId, onReplyPosted }) {
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // NEW
-  const { user } = useContext(AuthContext);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const { user } = useContext(AuthContext);
   const deleteComment = useDeleteComment();
 
   const replies = allComments.filter((c) => c.parentCommentId === comment._id);
@@ -23,14 +23,16 @@ export default function CommentCard({ comment, allComments, postId, onReplyPoste
       ? getBackendImageUrl(userInfo.profilePhoto)
       : DEFAULT_AVATAR;
 
-  const isOwner = user && (user._id === userInfo._id || user.id === userInfo._id);
+  const currentUserId = user?._id || user?.id;
+  const commentOwnerId = userInfo?._id;
+  const isCommentAuthor = currentUserId === commentOwnerId;
+  const isPostOwner = currentUserId === postOwnerId;
+  const canDelete = isCommentAuthor || isPostOwner;
 
-  // Open the modal instead of immediate delete
   const handleDeleteClick = () => {
     setShowDeleteModal(true);
   };
 
-  // Confirm delete handler
   const handleConfirmDelete = () => {
     deleteComment.mutate(comment._id, {
       onSuccess: () => {
@@ -57,9 +59,9 @@ export default function CommentCard({ comment, allComments, postId, onReplyPoste
               <span className="font-semibold text-sm text-gray-900 dark:text-white">
                 {username}
               </span>
-              {isOwner && (
+              {canDelete && (
                 <button
-                  onClick={handleDeleteClick} // open modal
+                  onClick={handleDeleteClick}
                   className="text-xs text-red-500 hover:underline"
                 >
                   Delete
@@ -112,6 +114,7 @@ export default function CommentCard({ comment, allComments, postId, onReplyPoste
                 comment={reply}
                 allComments={allComments}
                 postId={postId}
+                postOwnerId={postOwnerId} // ✅ Important
                 onReplyPosted={onReplyPosted}
               />
             ))}
