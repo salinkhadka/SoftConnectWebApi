@@ -10,7 +10,7 @@ router.post("/login", userController.loginUser);
 
 // Protected routes
 router.get("/getAll", userController.getUsers); 
-router.get("/:id", authenticateUser, userController.getOneUser);     // Logged-in user or admin
+router.get("/:id", userController.getOneUser);     // Logged-in user or admin
 router.put("/:id", authenticateUser,fileUpload.single('profilePhoto'), userController.updateOneUser);  // Logged-in user
 router.delete("/:id", authenticateUser, isAdmin, userController.deleteOneUser); // Admin-only
 

@@ -14,6 +14,7 @@ import UserPageAdmin from '../pages/Admin/UserPageAdmin';
 import FeedComponent from '../components/FeedComponent';
 import ProfileHeader from '../components/ProfileHeader';
 import MyProfileSection from '../pages/ProfilePage';
+import UserProfile from '../components/ProfileVisitHeader';
 
 
 export default function AppRouter() {
@@ -36,7 +37,7 @@ export default function AppRouter() {
               <Route index element={<FeedComponent/>} />
               <Route path="feed" element={<FeedComponent />} />
               <Route path="profile" element={<MyProfileSection />} />
-              <Route path="/:userid" element={<>userprofile</>}/>
+              <Route path="/:userid" element={<UserProfile/>}/>
 
               {/* Add other subroutes like messages, profile, etc. */}
             </Route>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:2000/"; // fixed "locahost" typo and added "http://"
+const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:2000/"; 
 
 const instance = axios.create({
   baseURL: API_URL,

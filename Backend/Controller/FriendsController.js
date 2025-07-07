@@ -3,14 +3,16 @@ const User = require('../Model/UserModel');
 const mongoose = require('mongoose');
 
 // ✅ Follow a user
+// Assuming you have some middleware that sets req.user with the authenticated user's ID
 exports.followUser = async (req, res) => {
-  const { followerId, followeeId } = req.body;
+  const followerId = req.user._id;  // get follower from authenticated user
+  const { followeeId } = req.body;
 
-  if (!followerId || !followeeId) {
-    return res.status(400).json({ success: false, message: "Missing followerId or followeeId" });
+  if (!followeeId) {
+    return res.status(400).json({ success: false, message: "Missing followeeId" });
   }
 
-  if (followerId === followeeId) {
+  if (followerId.toString() === followeeId) {
     return res.status(400).json({ success: false, message: "You cannot follow yourself" });
   }
 
@@ -18,7 +20,6 @@ exports.followUser = async (req, res) => {
     const follow = new Follow({ follower: followerId, followee: followeeId });
     await follow.save();
 
-    // ✅ Update user follow counters
     await User.findByIdAndUpdate(followerId, { $inc: { followingCount: 1 } });
     await User.findByIdAndUpdate(followeeId, { $inc: { followersCount: 1 } });
 
@@ -33,12 +34,13 @@ exports.followUser = async (req, res) => {
 };
 
 
-// ✅ Unfollow a user
-exports.unfollowUser = async (req, res) => {
-  const { followerId, followeeId } = req.body;
 
-  if (!followerId || !followeeId) {
-    return res.status(400).json({ success: false, message: "Missing followerId or followeeId" });
+exports.unfollowUser = async (req, res) => {
+  const followerId = req.user._id;
+  const { followeeId } = req.body;
+
+  if (!followeeId) {
+    return res.status(400).json({ success: false, message: "Missing followeeId" });
   }
 
   try {
@@ -48,7 +50,6 @@ exports.unfollowUser = async (req, res) => {
       return res.status(404).json({ success: false, message: "Follow relationship not found" });
     }
 
-    // ✅ Update user follow counters
     await User.findByIdAndUpdate(followerId, { $inc: { followingCount: -1 } });
     await User.findByIdAndUpdate(followeeId, { $inc: { followersCount: -1 } });
 
@@ -58,6 +59,7 @@ exports.unfollowUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 // ✅ Get followers of a user

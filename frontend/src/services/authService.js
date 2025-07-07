@@ -40,11 +40,11 @@ export const getAllUsersService = async (params) => {
 };
 
 
-// Get one user
 export const getUserByIdService = async (id) => {
   try {
     const response = await getUserByIdApi(id);
-    return response.data;
+    // your router returns data in res.data.data (from earlier example)
+    return response.data.data;  // <-- return user data directly
   } catch (err) {
     console.error(err);
     throw err.response?.data || { message: "Failed to fetch user" };

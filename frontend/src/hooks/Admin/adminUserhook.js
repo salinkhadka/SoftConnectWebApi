@@ -23,8 +23,6 @@ export const useGetUsers = ({ search }) => {
   });
 };
 
-
-
 export const useUser = (id) =>
   useQuery({
     queryKey: ["user", id],

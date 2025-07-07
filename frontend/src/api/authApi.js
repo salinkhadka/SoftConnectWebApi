@@ -17,14 +17,8 @@ export const getAllUsersApi = (params) => {
   return axios.get("user/getAll", { params });
 };
 
-// Get one user by ID (token required)
 export const getUserByIdApi = (id) => {
-  const token = localStorage.getItem("token");
-  return axios.get(`user/${id}`, {
-    headers: {
-      ...(token && { Authorization: `Bearer ${token}` }),
-    },
-  });
+  return axios.get(`http://localhost:2000/user/${id}`);
 };
 
 // Update user (token required)
