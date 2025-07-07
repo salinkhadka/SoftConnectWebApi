@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { IconButton, Menu, MenuItem, Button } from "@mui/material";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { useFollowUser, useUnfollowUser } from "../hooks/friendsHook";
 import { AuthContext } from "../auth/AuthProvider";
+import { toast } from "react-toastify"; // ✅ Toast
 
 const PURPLE = "#37225C";
 const LAVENDER = "#B8A6E6";
@@ -21,23 +23,27 @@ const ProfileActions = ({
   const { user: currentUser } = useContext(AuthContext);
   const followUser = useFollowUser();
   const unfollowUser = useUnfollowUser();
+  const navigate = useNavigate();
 
   const handleFollow = () => {
     if (!viewedUserId || !currentUser?._id || viewedUserId === currentUser._id) return;
-    followUser.mutate(viewedUserId, {
-      onSuccess: () => {
-        // optionally close menus or handle side effects
-      },
-    });
+    followUser.mutate(viewedUserId);
   };
 
   const handleUnfollow = () => {
     if (!viewedUserId || !currentUser?._id || viewedUserId === currentUser._id) return;
-    unfollowUser.mutate(viewedUserId, {
-      onSuccess: () => {
-        // optionally close menus or handle side effects
-      },
-    });
+    unfollowUser.mutate(viewedUserId);
+  };
+
+  const handleMessage = () => {
+    if (!isFollowing) {
+      toast.warning("You must follow this user to message them.", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+      return;
+    }
+    navigate(`/${viewedUserId}/message`);
   };
 
   if (isOwnProfile) {
@@ -45,7 +51,6 @@ const ProfileActions = ({
       <div className="flex gap-3 items-center" style={{ marginBottom: 8 }}>
         <Button
           variant="outlined"
-          size="medium"
           onClick={onEditClick}
           sx={{
             textTransform: "none",
@@ -117,7 +122,6 @@ const ProfileActions = ({
       {isFollowing ? (
         <Button
           variant="outlined"
-          size="medium"
           onClick={handleUnfollow}
           disabled={unfollowUser.isLoading}
           sx={{
@@ -141,7 +145,6 @@ const ProfileActions = ({
       ) : (
         <Button
           variant="contained"
-          size="medium"
           onClick={handleFollow}
           disabled={followUser.isLoading}
           sx={{
@@ -166,7 +169,7 @@ const ProfileActions = ({
 
       <Button
         variant="outlined"
-        size="medium"
+        onClick={handleMessage}
         sx={{
           borderColor: LAVENDER,
           color: PURPLE,

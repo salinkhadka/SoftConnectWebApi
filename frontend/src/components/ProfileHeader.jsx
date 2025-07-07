@@ -44,7 +44,7 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                   isOwnProfile={isOwnProfile}
                   anchorEl={anchorEl}
                   viewedUserId={user?._id}
-                  isFollowing={isFollowing}   // ✅ Pass the boolean here
+                  isFollowing={isFollowing}   
                   onEditClick={() => {
                     setPreviewPhoto(null);
                     setOpenEdit(true);

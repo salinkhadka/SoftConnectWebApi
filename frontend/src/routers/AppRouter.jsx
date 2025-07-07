@@ -38,8 +38,8 @@ export default function AppRouter() {
               <Route path="feed" element={<FeedComponent />} />
               <Route path="profile" element={<MyProfileSection />} />
               <Route path="/:userid" element={<UserProfile/>}/>
+              <Route path="/:userid/message" element={<>messaging todoooo</>}/>
 
-              {/* Add other subroutes like messages, profile, etc. */}
             </Route>
           </Route>
         </Route>

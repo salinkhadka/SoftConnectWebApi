@@ -1,6 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import ProfileHeader from "../components/ProfileHeader";
+import ProfilePostsSection from "../components/ProfilePostsSection";
 import { useUser } from "../hooks/Admin/adminUserhook";
 
 export default function UserProfile() {
@@ -16,5 +17,10 @@ export default function UserProfile() {
   if (error) return <div>Error loading user</div>;
   if (!user) return <div>User not found</div>;
 
-  return <ProfileHeader user={user} onUpdateUser={onUpdateUser} />;
+  return (
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <ProfileHeader user={user} onUpdateUser={onUpdateUser} />
+      <ProfilePostsSection user={user} />
+    </div>
+  );
 }

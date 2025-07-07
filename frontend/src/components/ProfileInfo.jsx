@@ -1,7 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FiMail, FiUser, FiCalendar } from "react-icons/fi";
+import { useFollowers, useFollowing } from "../hooks/friendsHook";
+import FollowersFollowingModal from "./FollowersFollowingModal";
 
 const ProfileInfo = ({ user, posts, postsLoading }) => {
+  const [followersOpen, setFollowersOpen] = useState(false);
+  const [followingOpen, setFollowingOpen] = useState(false);
+
+  const [followersList, setFollowersList] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
+
+  const { data: followersData } = useFollowers(user._id);
+  const { data: followingData } = useFollowing(user._id);
+
+  useEffect(() => {
+    if (followersData?.data) {
+      setFollowersList(followersData.data);
+    }
+  }, [followersData]);
+
+  useEffect(() => {
+    if (followingData?.data) {
+      setFollowingList(followingData.data);
+    }
+  }, [followingData]);
+
   return (
     <div className="flex-1 space-y-5 w-full">
       <div>
@@ -17,12 +40,12 @@ const ProfileInfo = ({ user, posts, postsLoading }) => {
         <span>
           <b>{postsLoading ? "..." : posts?.data?.length || 0}</b> posts
         </span>
-        <span>
-          <b>{user.followersCount}</b> followers
-        </span>
-        <span>
-          <b>{user.followingCount}</b> following
-        </span>
+        <button onClick={() => setFollowersOpen(true)} className="hover:underline">
+          <b>{followersList.length}</b> followers
+        </button>
+        <button onClick={() => setFollowingOpen(true)} className="hover:underline">
+          <b>{followingList.length}</b> following
+        </button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-800 dark:text-gray-300">
@@ -41,6 +64,20 @@ const ProfileInfo = ({ user, posts, postsLoading }) => {
           </p>
         )}
       </div>
+
+      {/* Modals */}
+      <FollowersFollowingModal
+        open={followersOpen}
+        onClose={() => setFollowersOpen(false)}
+        title="Followers"
+        users={followersList}
+      />
+      <FollowersFollowingModal
+        open={followingOpen}
+        onClose={() => setFollowingOpen(false)}
+        title="Following"
+        users={followingList}
+      />
     </div>
   );
 };
