@@ -75,7 +75,7 @@ export default function HomePage() {
     <div className="flex h-screen bg-white dark:bg-[#121018] text-black dark:text-white font-sans overflow-hidden transition-colors duration-500">
       {/* Sidebar */}
       <aside
-        className="w-[23%] hidden sm:flex flex-col justify-between p-4"
+        className="w-[18%] hidden sm:flex flex-col justify-between p-4"
         style={{
           background: PURPLE,
           borderRight: '2px solid #ede9fe',
@@ -113,7 +113,7 @@ export default function HomePage() {
               <FiUsers size={28} />
               <span>Friends</span>
             </NavLink>
-            <NavLink to="/messages" className={linkStyle}>
+            <NavLink to="/inbox" className={linkStyle}>
               <FiMessageCircle size={28} />
               <span>Messages</span>
             </NavLink>

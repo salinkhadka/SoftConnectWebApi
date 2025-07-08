@@ -16,6 +16,9 @@ import ProfileHeader from '../components/ProfileHeader';
 import MyProfileSection from '../pages/ProfilePage';
 import UserProfile from '../components/ProfileVisitHeader';
 
+// ✅ Messaging
+import InboxPage from '../components/InboxPage';
+import MessagePage from '../components/MessagePage';
 
 export default function AppRouter() {
   return (
@@ -34,12 +37,12 @@ export default function AppRouter() {
         <Route element={<NormalUserRoute />}>
           <Route element={<UserLayout />}>
             <Route path="/" element={<HomePage />}>
-              <Route index element={<FeedComponent/>} />
+              <Route index element={<FeedComponent />} />
               <Route path="feed" element={<FeedComponent />} />
               <Route path="profile" element={<MyProfileSection />} />
-              <Route path="/:userid" element={<UserProfile/>}/>
-              <Route path="/:userid/message" element={<>messaging todoooo</>}/>
-
+              <Route path="/inbox" element={<InboxPage />} />
+              <Route path="/:userid" element={<UserProfile />} />
+              <Route path="/:userid/message" element={<MessagePage />} />
             </Route>
           </Route>
         </Route>

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const FollowController = require('../Controller/FriendsController');
-const { authenticateUser } = require("../Middleware/AuthMiddleware");
+const { authenticateUser } = require("../middleware/AuthMiddleware");
 
 router.post('/follow', authenticateUser, FollowController.followUser);
 router.post('/unfollow', authenticateUser, FollowController.unfollowUser);

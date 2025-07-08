@@ -11,18 +11,18 @@ const notificationSchema = new Schema({
   sender: { 
     type: Schema.Types.ObjectId, 
     ref: 'User' 
-  }, // who triggered it, optional for system notifications
+  }, 
 
   type: { 
     type: String, 
     required: true,
-    enum: ['friend_request', 'follow', 'comment', 'like', 'message', 'system'] // you can expand this list
-  }, // type of notification
+    enum: ['friend_request', 'follow', 'comment', 'like', 'message', 'system'] 
+  }, 
 
   message: { 
     type: String, 
     required: true 
-  }, // notification text to display
+  }, 
 
   relatedId: { 
     type: Schema.Types.ObjectId 
