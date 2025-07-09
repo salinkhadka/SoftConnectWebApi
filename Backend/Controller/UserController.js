@@ -1,7 +1,84 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../Model/UserModel");
+const nodemailer = require("nodemailer");
 const mongoose = require('mongoose');
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+const base64urlEncode = (str) =>
+  Buffer.from(str)
+    .toString('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+
+exports.sendResetLink = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const token = jwt.sign({ id: user._id }, process.env.SECRET, {
+      expiresIn: "15m",
+    });
+
+    // Encode token URL-safe base64
+    const encodedToken = base64urlEncode(token);
+
+    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${encodedToken}`;
+
+    const mailOptions = {
+      from: `"SoftConnect" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: "Reset your password",
+      html: `
+        <p>Hello ${user.username},</p>
+        <p>Click the button below to reset your password:</p>
+        <a href="${resetUrl}" style="display:inline-block;padding:10px 20px;background:#37225C;color:#fff;text-decoration:none;border-radius:4px;">Reset Password</a>
+        <p>This link will expire in 15 minutes.</p>
+      `,
+    };
+
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err)
+        return res
+          .status(500)
+          .json({ success: false, message: "Error sending email" });
+      console.log("Email sent: " + info.response);
+      res.status(200).json({ success: true, message: "Reset email sent" });
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+
+
+
+
+exports.resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET);
+    const hashed = await bcrypt.hash(password, 10);
+    await User.findByIdAndUpdate(decoded.id, { password: hashed });
+
+    res.status(200).json({ success: true, message: "Password updated" });
+  } catch (err) {
+    res
+      .status(400)
+      .json({ success: false, message: "Invalid or expired token" });
+  }
+};
+
 
 // Register
 exports.registerUser = async (req, res) => {

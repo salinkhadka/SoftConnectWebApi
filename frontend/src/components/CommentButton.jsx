@@ -2,6 +2,7 @@ import React from "react";
 import { FiMessageCircle } from "react-icons/fi";
 import { usePostComments } from "../hooks/usecommenthook";
 
+
 export default function CommentCount({ postId, openPostModal }) {
   const { data, isLoading } = usePostComments(postId);
   const count = data?.data?.length || 0;

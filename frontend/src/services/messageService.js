@@ -3,6 +3,7 @@ import {
   getMessages,
   markMessagesAsRead,
   getConversationUsers,
+  deleteMessage
 } from "../api/messageApi";
 
 // ✅ Send a message
@@ -26,6 +27,17 @@ export const getMessagesService = async (user1Id, user2Id) => {
     throw err.response?.data || { message: "Failed to fetch messages" };
   }
 };
+// ✅ Delete a message by ID
+export const deleteMessageService = async (messageId) => {
+  try {
+    const response = await deleteMessage(messageId);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err.response?.data || { message: "Failed to delete message" };
+  }
+};
+
 
 // ✅ Mark messages from a user as read service
 export const markMessagesAsReadService = async (otherUserId) => {

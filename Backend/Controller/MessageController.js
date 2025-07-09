@@ -259,3 +259,35 @@ exports.debugSimpleAggregation = async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 };
+
+
+// Delete a specific message
+exports.deleteMessage = async (req, res) => {
+  try {
+    const messageId = req.params.messageId;
+    const userId = req.user.id; // From auth middleware
+
+    if (!mongoose.Types.ObjectId.isValid(messageId)) {
+      return res.status(400).json({ error: 'Invalid message ID' });
+    }
+
+    const message = await Message.findById(messageId);
+
+    if (!message) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+
+    // Only sender should be allowed to delete the message
+    if (message.sender.toString() !== userId) {
+      return res.status(403).json({ error: 'Unauthorized to delete this message' });
+    }
+
+    await Message.findByIdAndDelete(messageId);
+
+    res.json({ message: 'Message deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete message' });
+  }
+};
+

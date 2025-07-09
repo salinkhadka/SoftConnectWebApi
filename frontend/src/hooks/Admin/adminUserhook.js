@@ -8,11 +8,39 @@ import {
   getAllUsersService,
   getUserByIdService,
   updateUserService,
-  deleteUserService,
+  deleteUserService,resetPasswordService,requestPasswordResetService
 } from "../../services/authService";
-
-
 import { useEffect } from 'react';
+
+
+
+
+export const useRequestPasswordReset = () => {
+  return useMutation({
+    mutationFn: (email) => requestPasswordResetService(email),
+    mutationKey: ["request_password_reset"],
+    onSuccess: (data) => {
+      toast.success(data.message || "Reset link sent. Check your email.");
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Failed to request password reset");
+    },
+  });
+};
+
+// Reset password hook
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: ({ token, newPassword }) => resetPasswordService(token, newPassword),
+    mutationKey: ["reset_password"],
+    onSuccess: (data) => {
+      toast.success(data.message || "Password reset successful");
+    },
+    onError: (error) => {
+      toast.error(error?.message || "Failed to reset password");
+    },
+  });
+};
 
 export const useGetUsers = ({ search }) => {
   return useQuery({

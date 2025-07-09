@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import { useCreateComment } from "../hooks/usecommenthook";
 import { AuthContext } from "../auth/AuthProvider";
 import { toast } from "react-toastify";
+import { createNotification } from "../api/notificationApi";
 
 export default function WriteComment({ postId, parentCommentId = null, onCommentPosted }) {
   const { user } = useContext(AuthContext);
@@ -9,30 +10,43 @@ export default function WriteComment({ postId, parentCommentId = null, onComment
   const createCommentMutation = useCreateComment();
 
   const handleSubmit = () => {
-    if (!user) {
-      toast.error("You must be logged in to comment");
-      return;
-    }
-    if (!content.trim()) {
-      toast.error("Comment cannot be empty");
-      return;
-    }
-    createCommentMutation.mutate(
-      {
-        userId: user.id || user._id,
-        postId,
-        content: content.trim(),
-        parentCommentId,
+  if (!user) {
+    toast.error("You must be logged in to comment");
+    return;
+  }
+  if (!content.trim()) {
+    toast.error("Comment cannot be empty");
+    return;
+  }
+  createCommentMutation.mutate(
+    {
+      userId: user.id || user._id,
+      postId,
+      content: content.trim(),
+      parentCommentId,
+    },
+    {
+      onSuccess: () => {
+        setContent("");
+        onCommentPosted?.();
+        toast.success("Comment posted");
+
+        // Create notification if commenter is not the post owner
+        if (postUserId && postUserId !== (user.id || user._id)) {
+          createNotification({
+            recipient: postUserId,
+            type: "comment",
+            message: `${user.username} commented on your post.`,
+            relatedId: postId,
+          }).catch((err) => {
+            console.error("Failed to create notification:", err);
+          });
+        }
       },
-      {
-        onSuccess: () => {
-          setContent("");
-          onCommentPosted?.();
-          toast.success("Comment posted");
-        },
-      }
-    );
-  };
+    }
+  );
+};
+
 
   return (
     <div className="flex gap-2">

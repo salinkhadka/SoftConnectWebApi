@@ -13,6 +13,16 @@ export const sendMessage = (recipientId, content) => {
     }
   );
 };
+// Delete a message by ID
+export const deleteMessage = (messageId) => {
+  const token = localStorage.getItem("token");
+
+  return axios.delete(`/message/delete/${messageId}`, {
+    headers: {
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+  });
+};
 
 // Get messages between two users
 export const getMessages = (user1Id, user2Id) => {

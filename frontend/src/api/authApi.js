@@ -8,6 +8,18 @@ export const registerUserApi = (data) =>
     },
   });
 
+
+// Request password reset link (no token needed)
+export const requestPasswordResetApi = (email) => {
+  return axios.post("user/request-reset", { email });
+};
+
+export const resetPasswordApi = (token, password) => {
+  return axios.post(`user/reset-password/${token}`, { password });
+};
+
+
+
 // Login user (no token needed)
 export const loginUserApi = (data) =>
   axios.post("user/login", data);

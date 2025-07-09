@@ -5,6 +5,7 @@ import {
   getUserByIdApi,
   updateUserApi,
   deleteUserApi,
+  resetPasswordApi,requestPasswordResetApi
 } from "../api/authApi";
 
 // Register
@@ -38,7 +39,26 @@ export const getAllUsersService = async (params) => {
     throw err.response?.data || { message: "User fetch failed" };
   }
 };
+export const requestPasswordResetService = async (email) => {
+  try {
+    const response = await requestPasswordResetApi(email);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err.response?.data || { message: "Failed to request password reset" };
+  }
+};
 
+// Reset password with token
+export const resetPasswordService = async (token, newPassword) => {
+  try {
+    const response = await resetPasswordApi(token, newPassword);
+    return response.data;
+  } catch (err) {
+    console.error(err);
+    throw err.response?.data || { message: "Failed to reset password" };
+  }
+};
 
 export const getUserByIdService = async (id) => {
   try {

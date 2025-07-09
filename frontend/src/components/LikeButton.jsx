@@ -1,28 +1,67 @@
 import React from "react";
 import { usePostLikes, useLikePost, useUnlikePost } from "../hooks/uselikehook";
+import { useCreateNotification } from "../hooks/notificationHooks";
 
-export default function LikeButton({ postId }) {
+export default function LikeButton({ postId, postOwnerId }) {
   const userId = JSON.parse(localStorage.getItem("user"))?._id;
 
-  // Fetch likes data
   const { data: likesData = [], isLoading: likesLoading } = usePostLikes(postId);
 
-  // Mutations for like/unlike
   const likeMutation = useLikePost();
   const unlikeMutation = useUnlikePost();
+  const createNotificationMutation = useCreateNotification();
 
   const hasLiked = likesData.some((like) => like.userId._id === userId);
 
-  // Disable button while any mutation or likes fetching is in progress
-  const isLoading = likesLoading || likeMutation.isLoading || unlikeMutation.isLoading;
+  const isLoading =
+    likesLoading ||
+    likeMutation.isLoading ||
+    unlikeMutation.isLoading ||
+    createNotificationMutation.isLoading;
 
   const handleToggle = () => {
-    if (isLoading) return; // prevent multiple clicks while loading
+    if (isLoading) {
+      console.log("Operation in progress, ignoring click");
+      return;
+    }
 
     if (hasLiked) {
+      console.log("Unliking post", postId);
       unlikeMutation.mutate(postId);
     } else {
-      likeMutation.mutate(postId);
+      console.log("Liking post", postId);
+      likeMutation.mutate(postId, {
+        onSuccess: () => {
+          console.log("Like success!");
+
+          if (!postOwnerId) {
+            console.warn("No postOwnerId provided — skipping notification");
+            return;
+          }
+
+          if (postOwnerId === userId) {
+            console.log("Post owner is current user — skipping notification");
+            return;
+          }
+
+          console.log("Creating notification for post owner", postOwnerId);
+          createNotificationMutation.mutate(
+            {
+              recipient: postOwnerId,
+              type: "like",
+              message: "liked your post",
+              relatedId: postId,
+            },
+            {
+              onSuccess: (data) => console.log("Notification created:", data),
+              onError: (error) => console.error("Notification creation failed:", error),
+            }
+          );
+        },
+        onError: (error) => {
+          console.error("Like mutation failed:", error);
+        },
+      });
     }
   };
 

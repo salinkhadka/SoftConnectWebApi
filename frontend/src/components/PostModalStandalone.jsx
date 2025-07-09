@@ -6,6 +6,7 @@ import { usePostComments, useCreateComment } from "../hooks/usecommenthook";
 import CommentCard from "./CommentCard";
 import { toast } from "react-toastify";
 import LikeButton from "./LikeButton";
+import { createNotification } from "../api/notificationApi";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
@@ -35,24 +36,37 @@ export default function PostModalStandalone({ post, isOpen, onClose }) {
   const parentComments = allComments.filter((c) => !c.parentCommentId);
 
   const handlePostComment = () => {
-    if (!user) return toast.error("You must be logged in to comment");
-    if (!newComment.trim()) return toast.error("Comment cannot be empty");
+  if (!user) return toast.error("You must be logged in to comment");
+  if (!newComment.trim()) return toast.error("Comment cannot be empty");
 
-    createCommentMutation.mutate(
-      {
-        userId: user._id || user.id,
-        postId,
-        content: newComment.trim(),
-        parentCommentId: null,
+  createCommentMutation.mutate(
+    {
+      userId: user._id || user.id,
+      postId,
+      content: newComment.trim(),
+      parentCommentId: null,
+    },
+    {
+      onSuccess: () => {
+        setNewComment("");
+        refetch();
+
+        // Create notification if commenter is NOT the post owner
+        if (postUser._id && postUser._id !== (user._id || user.id)) {
+          createNotification({
+            recipient: postUser._id,
+            type: "comment",
+            message: `${user.username} commented on your post.`,
+            relatedId: postId,
+          }).catch((err) => {
+            console.error("Notification creation failed:", err);
+          });
+        }
       },
-      {
-        onSuccess: () => {
-          setNewComment("");
-          refetch();
-        },
-      }
-    );
-  };
+    }
+  );
+};
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
@@ -95,7 +109,7 @@ export default function PostModalStandalone({ post, isOpen, onClose }) {
 
           {/* Like/Comment Actions */}
           <div className="flex items-center justify-between mt-2 py-3 border-t border-gray-200 dark:border-gray-700">
-            <LikeButton postId={postId} />
+            <LikeButton postId={postId} postOwnerId={post.userId?._id} />
             <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 dark:text-gray-100">
               <FiMessageCircle size={20} />
               <span>Comment</span>

@@ -1,18 +1,22 @@
-import { Navigate,Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { AuthContext } from "../auth/AuthProvider";
 import { useContext } from "react";
-
-import React from 'react'
+import React from "react";
 
 function GuestRoute() {
-    const {user} =useContext(AuthContext)
-    const {loading}=useContext(AuthContext)
+  const { user, loading } = useContext(AuthContext);
+  const location = useLocation();
 
-    if(loading) return <>Loading</>
-    if(user) return <Navigate to="/" />
+  // Allow access to reset-password route even if user is logged in
+  const isResetPasswordPage = location.pathname.startsWith("/reset-password");
 
+  if (loading) return <>Loading</>;
 
-  return <Outlet/>
+  if (user && !isResetPasswordPage) {
+    return <Navigate to="/" />;
+  }
+
+  return <Outlet />;
 }
 
-export default GuestRoute
+export default GuestRoute;

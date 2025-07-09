@@ -138,7 +138,7 @@ export default function UserPostsGrid({ posts, user }) {
                   className="py-2 px-3"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <LikeButton postId={post._id} />
+                  <LikeButton postId={post._id} postOwnerId={post.userId?._id} />
                 </div>
                 <div onClick={(e) => e.stopPropagation()}>
                   <CommentCount postId={post._id} openPostModal={() => openPostModal(post)} />

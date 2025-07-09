@@ -4,7 +4,8 @@ import { IconButton, Menu, MenuItem, Button } from "@mui/material";
 import { FiSettings, FiLogOut } from "react-icons/fi";
 import { useFollowUser, useUnfollowUser } from "../hooks/friendsHook";
 import { AuthContext } from "../auth/AuthProvider";
-import { toast } from "react-toastify"; // ✅ Toast
+import { toast } from "react-toastify";
+import { createNotificationService } from "../services/notificationService"; // <-- added
 
 const PURPLE = "#37225C";
 const LAVENDER = "#B8A6E6";
@@ -27,7 +28,20 @@ const ProfileActions = ({
 
   const handleFollow = () => {
     if (!viewedUserId || !currentUser?._id || viewedUserId === currentUser._id) return;
-    followUser.mutate(viewedUserId);
+
+    followUser.mutate(viewedUserId, {
+      onSuccess: () => {
+        // Create notification for the followed user
+        createNotificationService({
+          recipient: viewedUserId,
+          type: "follow",
+          message: `${currentUser.username} started following you.`,
+          relatedId: currentUser._id,
+        }).catch((err) => {
+          console.error("Failed to create follow notification:", err);
+        });
+      },
+    });
   };
 
   const handleUnfollow = () => {

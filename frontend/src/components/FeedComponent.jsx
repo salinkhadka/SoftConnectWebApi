@@ -112,7 +112,7 @@ function PostCard({ post, openModal }) {
 
       {/* Action Buttons */}
       <div className="flex justify-between items-center mt-3 pt-2 border-t border-gray-200 dark:border-gray-700">
-        <LikeButton postId={post._id} />
+        <LikeButton postId={post._id} postOwnerId={post.userId?._id} />
         <CommentCount postId={post._id} openPostModal={() => openModal(post)} />
       </div>
     </div>

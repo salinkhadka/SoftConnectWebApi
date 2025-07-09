@@ -5,6 +5,7 @@ import {
   getMessagesService,
   markMessagesAsReadService,
   getConversationsService,
+  deleteMessageService
 } from "../services/messageService";
 
 // ✅ Fetch conversation messages between two users
@@ -61,7 +62,27 @@ export const useConversations = (userId) =>
     queryKey: ["conversations", userId],
     queryFn: () => getConversationsService(userId),
     enabled: !!userId,
+    // refetchInterval: 10000, // Auto-refetch every 30 seconds
     onError: (err) => {
       toast.error(err?.message || "Failed to load conversations");
     },
   });
+  // ✅ Delete a message
+export const useDeleteMessage = (user1Id, user2Id) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (messageId) => deleteMessageService(messageId),
+    mutationKey: ["delete_message"],
+    onSuccess: () => {
+      toast.success("Message deleted");
+      queryClient.invalidateQueries(["messages", user1Id, user2Id]);
+      queryClient.invalidateQueries(["conversations", user1Id]);
+    },
+    onError: (err) => {
+      toast.error(err?.message || "Failed to delete message");
+    },
+  });
+};
+
+

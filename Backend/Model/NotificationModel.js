@@ -1,39 +1,35 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
 
-const notificationSchema = new Schema({
-  recipient: { 
-    type: Schema.Types.ObjectId, 
-    ref: 'User', 
-    required: true 
-  }, // who receives the notification
-
-  sender: { 
-    type: Schema.Types.ObjectId, 
-    ref: 'User' 
-  }, 
-
-  type: { 
-    type: String, 
-    required: true,
-    enum: ['friend_request', 'follow', 'comment', 'like', 'message', 'system'] 
-  }, 
-
-  message: { 
-    type: String, 
-    required: true 
-  }, 
-
-  relatedId: { 
-    type: Schema.Types.ObjectId 
-  }, // ID of the related entity (friend request, comment, etc.)
-
-  isRead: { 
-    type: Boolean, 
-    default: false 
-  } // whether the user has seen this notification
-}, { 
-  timestamps: true // adds createdAt and updatedAt automatically
-});
+const notificationSchema = new mongoose.Schema(
+  {
+    sender: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+    recipient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    type: {
+      type: String,
+      required: true,
+      enum: ['like', 'comment', 'follow'],
+    },
+    message: {
+      type: String,
+      required: true,
+    },
+    relatedId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
 
 module.exports = mongoose.model('Notification', notificationSchema);
