@@ -1,17 +1,17 @@
 "use client"
 
 import { useContext } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
 import { useMessages, useSendMessage, useDeleteMessage } from "../hooks/messagehooks.js"
 import ChatBox from "./ChatBox.jsx"
 import ChatInput from "./ChatInput.jsx"
 import { AuthContext } from "../auth/AuthProvider.jsx"
-import { FiArrowLeft, FiUser } from "react-icons/fi"
-import { useNavigate } from "react-router-dom"
+import { FiArrowLeft, FiSettings } from "react-icons/fi"
+import { getBackendImageUrl } from "../utils/getBackendImageUrl.js"
+import { useUser } from "../hooks/Admin/adminUserhook.js" // <-- make sure this hook is correct
 
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
-const WHITE = "#FFFFFF"
 
 export default function MessagePage() {
   const { user } = useContext(AuthContext)
@@ -22,6 +22,8 @@ export default function MessagePage() {
   const { data: messages = [] } = useMessages(senderId, recipientId)
   const { mutate: sendMessage } = useSendMessage(senderId, recipientId)
   const { mutate: deleteMessage } = useDeleteMessage(senderId, recipientId)
+
+  const { data: recipient } = useUser(recipientId)
 
   const handleSend = (text) => {
     if (!text.trim()) return
@@ -36,10 +38,7 @@ export default function MessagePage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div
-            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
-            style={{ borderColor: PURPLE }}
-          ></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: PURPLE }}></div>
           <p className="text-gray-600">Loading user info...</p>
         </div>
       </div>
@@ -50,7 +49,7 @@ export default function MessagePage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <FiUser size={48} className="mx-auto mb-4 text-gray-400" />
+          <FiSettings size={48} className="mx-auto mb-4 text-gray-400" />
           <p className="text-gray-600">No recipient selected.</p>
         </div>
       </div>
@@ -85,19 +84,27 @@ export default function MessagePage() {
             >
               <FiArrowLeft size={20} className="text-white" />
             </button>
+
+            {/* Recipient Info */}
             <div className="flex items-center gap-3">
               <div className="relative">
                 <img
-                  src={`https://ui-avatars.com/api/?background=${LAVENDER.slice(
-                    1,
-                  )}&color=${PURPLE.slice(1)}&name=U`}
-                  alt="User"
-                  className="w-10 h-10 rounded-full border-2 border-white/30"
+                  src={
+                    recipient?.profilePhoto
+                      ? getBackendImageUrl(recipient.profilePhoto)
+                      : `https://ui-avatars.com/api/?background=${LAVENDER.slice(
+                          1
+                        )}&color=${PURPLE.slice(1)}&name=${recipient?.name || "U"}`
+                  }
+                  alt="Recipient"
+                  className="w-10 h-10 rounded-full border-2 border-white/30 object-cover"
                 />
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white"></div>
               </div>
               <div>
-                <h2 className="font-bold text-white">Chat with User</h2>
+                <h2 className="font-bold text-white">
+                  {recipient?.username || "Chat with User"}
+                </h2>
                 <p className="text-white/70 text-sm">Online</p>
               </div>
             </div>
