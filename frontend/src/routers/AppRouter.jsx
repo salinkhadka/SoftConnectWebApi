@@ -29,6 +29,7 @@ import NotificationPage from '../components/NotificationPage';
 // Auth & Password
 import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
+import ChangePassword from '../components/ChangePassword';
 
 export default function AppRouter() {
   return (
@@ -36,6 +37,7 @@ export default function AppRouter() {
       <Routes>
 
         <Route path="/reset-password/:token" element={<ResetPassword />} />
+        
 
         {/* Guest-only Routes */}
         <Route element={<GuestRoute />}>
@@ -44,6 +46,7 @@ export default function AppRouter() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+
           </Route>
 
           {/* Standalone public route without layout */}
@@ -61,6 +64,7 @@ export default function AppRouter() {
               <Route path="/notifications" element={<NotificationPage />} />
               <Route path="/:userid" element={<UserProfile />} />
               <Route path="/:userid/message" element={<MessagePage />} />
+              <Route path="/changepassword" element={<ChangePassword />} />
             </Route>
           </Route>
         </Route>

@@ -279,3 +279,34 @@ exports.uploadImage = (async (req, res, next) => {
     data: req.file.filename,
   });
 });
+
+
+// POST /user/verify-password
+exports.verifyPassword = async (req, res) => {
+  try {
+    const { userId, currentPassword } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (isMatch) {
+      const secret = process.env.SECRET || process.env.JWT_SECRET;
+      if (!secret) {
+        console.error("JWT secret not defined");
+        return res.status(500).json({ success: false, message: "JWT secret not configured" });
+      }
+
+      const token = jwt.sign({ id: user._id }, secret, { expiresIn: "10m" });
+      return res.json({ success: true, token });
+    } else {
+      return res.json({ success: false, message: "Incorrect password" });
+    }
+  } catch (error) {
+    console.error("Password verification error:", error);
+    return res.status(500).json({ success: false, message: error.message || "Server error" });
+  }
+};
