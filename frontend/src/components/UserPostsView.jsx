@@ -4,6 +4,8 @@ import { FiGlobe, FiLock, FiUsers } from "react-icons/fi";
 import LikeButton from "../components/LikeButton";
 import CommentCount from "./CommentButton";
 import PostModalStandalone from "../components/PostModalStandalone";
+import { useNavigate } from "react-router-dom";
+
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
@@ -46,6 +48,8 @@ function formatFacebookDate(dateStr) {
 
 export default function UserPostsGrid({ posts, user }) {
   const [modalOpen, setModalOpen] = useState(false);
+  const navigate = useNavigate();
+
   const [modalPost, setModalPost] = useState(null);
 
   // Open post modal on card click

@@ -8,6 +8,8 @@ import LikeButton from "../components/LikeButton";
 import { usePostComments, useCreateComment } from "../hooks/usecommenthook";
 import CommentCard from "./CommentCard";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+
 import { createNotification } from "../api/notificationApi";
 
 const PURPLE = "#37225C";
@@ -51,6 +53,8 @@ function formatFacebookDate(dateStr) {
 
 export default function PostModal({ isOpen, onClose, post }) {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+
   const [newComment, setNewComment] = useState("");
 
   if (!isOpen || !post) return null;
@@ -122,7 +126,15 @@ export default function PostModal({ isOpen, onClose, post }) {
               />
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-gray-900 dark:text-white">{username}</span>
+                  <span
+                    onClick={() => {
+                      if (postUser?._id) navigate(`/${postUser._id}`);
+                    }}
+                    className="font-bold text-gray-900 dark:text-white hover:underline cursor-pointer"
+                  >
+                    {username}
+                  </span>
+
                   <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-white/50 dark:bg-gray-700/50">
                     {icon}
                     <span className="text-xs font-medium">{label}</span>
