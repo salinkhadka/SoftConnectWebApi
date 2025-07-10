@@ -11,7 +11,7 @@ const WHITE = "#FFFFFF"
 const ProfileImage = ({ user, isOwnProfile, onEditClick }) => {
   return (
     <div className="relative group">
-      {/* Profile Image */}
+      {/* Profile Image - Larger size for better overlap effect */}
       <div className="relative">
         <img
           src={
@@ -20,7 +20,7 @@ const ProfileImage = ({ user, isOwnProfile, onEditClick }) => {
               : `https://ui-avatars.com/api/?background=${LAVENDER.slice(1)}&color=${PURPLE.slice(1)}&name=${user.username}&size=200`
           }
           alt="profile"
-          className="w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-2xl transition-all duration-300 group-hover:scale-105"
+          className="w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 rounded-full object-cover border-4 border-white dark:border-gray-700 shadow-2xl transition-all duration-300 group-hover:scale-105"
         />
 
         {/* Online Status Indicator */}

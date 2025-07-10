@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { FiMail, FiCalendar, FiAward } from "react-icons/fi"
+import { FiMail, FiCalendar } from "react-icons/fi"
 import { useFollowers, useFollowing } from "../hooks/friendsHook"
 import FollowersFollowingModal from "./FollowersFollowingModal"
 
@@ -32,27 +32,8 @@ const ProfileInfo = ({ user, posts, postsLoading }) => {
 
   return (
     <div className="space-y-6 w-full">
-      {/* User Name & Role */}
-      <div className="space-y-2">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">{user.username}</h1>
-        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
-          <div
-            className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium"
-            style={{
-              backgroundColor: `${LAVENDER}20`,
-              color: PURPLE,
-            }}
-          >
-            <FiAward size={16} />
-            <span>{user.role}</span>
-          </div>
-          <span className="text-gray-400">•</span>
-          <span className="text-sm">ID: {user.StudentId}</span>
-        </div>
-      </div>
-
       {/* Stats */}
-      <div className="flex gap-8 text-center sm:text-left">
+      <div className="flex gap-8 text-center sm:text-left justify-center lg:justify-start">
         <div className="group cursor-default">
           <div className="text-2xl font-bold text-gray-900 dark:text-white group-hover:scale-110 transition-transform">
             {postsLoading ? "..." : posts?.data?.length || 0}

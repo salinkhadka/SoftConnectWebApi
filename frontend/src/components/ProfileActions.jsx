@@ -76,18 +76,20 @@ const ProfileActions = ({
           sx={{
             textTransform: "none",
             fontWeight: "600",
-            borderColor: PURPLE,
-            color: PURPLE,
+            borderColor: "rgba(255,255,255,0.5)",
+            color: WHITE,
             borderRadius: "12px",
             paddingX: 3,
             paddingY: 1.5,
             fontSize: "1rem",
             borderWidth: 2,
+            backdropFilter: "blur(10px)",
+            backgroundColor: "rgba(255,255,255,0.1)",
             "&:hover": {
-              backgroundColor: `${LAVENDER}20`,
-              borderColor: LAVENDER,
+              backgroundColor: "rgba(255,255,255,0.2)",
+              borderColor: WHITE,
               transform: "translateY(-2px)",
-              boxShadow: `0 8px 25px ${PURPLE}30`,
+              boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
             },
             transition: "all 0.2s ease",
           }}
@@ -98,15 +100,15 @@ const ProfileActions = ({
         <IconButton
           onClick={onSettingsClick}
           sx={{
-            backgroundColor: `${LAVENDER}15`,
-            color: PURPLE,
+            backgroundColor: "rgba(255,255,255,0.15)",
+            color: WHITE,
             width: 48,
             height: 48,
+            backdropFilter: "blur(10px)",
             "&:hover": {
-              backgroundColor: LAVENDER,
-              color: WHITE,
+              backgroundColor: "rgba(255,255,255,0.25)",
               transform: "translateY(-2px)",
-              boxShadow: `0 8px 25px ${PURPLE}40`,
+              boxShadow: "0 8px 25px rgba(0,0,0,0.4)",
             },
             transition: "all 0.2s ease",
           }}
@@ -174,8 +176,9 @@ const ProfileActions = ({
           disabled={unfollowUser.isLoading}
           startIcon={<FiUserMinus size={18} />}
           sx={{
-            borderColor: "#dc2626",
+            borderColor: "rgba(220, 38, 38, 0.7)",
             color: "#dc2626",
+            backgroundColor: "rgba(255,255,255,0.9)",
             textTransform: "none",
             fontWeight: "600",
             borderRadius: "12px",
@@ -183,11 +186,12 @@ const ProfileActions = ({
             paddingY: 1.5,
             fontSize: "1rem",
             borderWidth: 2,
+            backdropFilter: "blur(10px)",
             "&:hover": {
-              backgroundColor: "#fef2f2",
+              backgroundColor: "rgba(220, 38, 38, 0.1)",
               borderColor: "#dc2626",
               transform: "translateY(-2px)",
-              boxShadow: "0 8px 25px #dc262630",
+              boxShadow: "0 8px 25px rgba(220, 38, 38, 0.3)",
             },
             transition: "all 0.2s ease",
           }}
@@ -201,19 +205,20 @@ const ProfileActions = ({
           disabled={followUser.isLoading}
           startIcon={<FiUserPlus size={18} />}
           sx={{
-            background: `linear-gradient(135deg, ${PURPLE} 0%, ${LAVENDER} 100%)`,
-            color: WHITE,
+            background: "rgba(255,255,255,0.9)",
+            color: PURPLE,
             textTransform: "none",
             fontWeight: "600",
             borderRadius: "12px",
             paddingX: 3,
             paddingY: 1.5,
             fontSize: "1rem",
-            boxShadow: `0 4px 15px ${PURPLE}40`,
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
             "&:hover": {
-              background: `linear-gradient(135deg, ${LAVENDER} 0%, ${PURPLE} 100%)`,
+              background: WHITE,
               transform: "translateY(-2px)",
-              boxShadow: `0 8px 25px ${PURPLE}50`,
+              boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
             },
             transition: "all 0.2s ease",
           }}
@@ -227,8 +232,9 @@ const ProfileActions = ({
         onClick={handleMessage}
         startIcon={<FiMessageCircle size={18} />}
         sx={{
-          borderColor: LAVENDER,
-          color: PURPLE,
+          borderColor: "rgba(255,255,255,0.5)",
+          color: WHITE,
+          backgroundColor: "rgba(255,255,255,0.1)",
           textTransform: "none",
           fontWeight: "600",
           borderRadius: "12px",
@@ -236,11 +242,12 @@ const ProfileActions = ({
           paddingY: 1.5,
           fontSize: "1rem",
           borderWidth: 2,
+          backdropFilter: "blur(10px)",
           "&:hover": {
-            backgroundColor: `${LAVENDER}20`,
-            borderColor: PURPLE,
+            backgroundColor: "rgba(255,255,255,0.2)",
+            borderColor: WHITE,
             transform: "translateY(-2px)",
-            boxShadow: `0 8px 25px ${PURPLE}30`,
+            boxShadow: "0 8px 25px rgba(0,0,0,0.3)",
           },
           transition: "all 0.2s ease",
         }}
