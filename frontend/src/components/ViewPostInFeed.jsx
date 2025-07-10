@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { useContext, useState } from "react"
-import { FiX, FiMessageCircle, FiLock, FiUsers, FiGlobe, FiShare2 } from "react-icons/fi"
-import { getBackendImageUrl } from "../utils/getBackendImageUrl"
-import { AuthContext } from "../auth/AuthProvider"
-import LikeButton from "../components/LikeButton"
-import { usePostComments, useCreateComment } from "../hooks/usecommenthook"
-import CommentCard from "./CommentCard"
-import { toast } from "react-toastify"
-import { createNotification } from "../api/notificationApi"
+import { useContext, useState } from "react";
+import { FiX, FiMessageCircle, FiLock, FiUsers, FiGlobe, FiShare2 } from "react-icons/fi";
+import { getBackendImageUrl } from "../utils/getBackendImageUrl";
+import { AuthContext } from "../auth/AuthProvider";
+import LikeButton from "../components/LikeButton";
+import { usePostComments, useCreateComment } from "../hooks/usecommenthook";
+import CommentCard from "./CommentCard";
+import { toast } from "react-toastify";
+import { createNotification } from "../api/notificationApi";
 
-const PURPLE = "#37225C"
-const LAVENDER = "#B8A6E6"
-const WHITE = "#FFFFFF"
+const PURPLE = "#37225C";
+const LAVENDER = "#B8A6E6";
+const WHITE = "#FFFFFF";
 
-const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U"
+const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
 const getPrivacyIcon = (privacy) => {
   switch (privacy) {
     case "public":
-      return { icon: <FiGlobe size={16} className="text-green-500" />, label: "Public" }
+      return { icon: <FiGlobe size={16} className="text-green-500" />, label: "Public" };
     case "private":
-      return { icon: <FiLock size={16} className="text-red-500" />, label: "Private" }
+      return { icon: <FiLock size={16} className="text-red-500" />, label: "Private" };
     case "friends":
-      return { icon: <FiUsers size={16} className="text-blue-500" />, label: "Friends" }
+      return { icon: <FiUsers size={16} className="text-blue-500" />, label: "Friends" };
     default:
-      return { icon: <FiGlobe size={16} className="text-green-500" />, label: "Public" }
+      return { icon: <FiGlobe size={16} className="text-green-500" />, label: "Public" };
   }
-}
+};
 
 function formatFacebookDate(dateStr) {
-  if (!dateStr) return ""
-  const date = new Date(dateStr)
-  const now = new Date()
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const now = new Date();
   if (
     date.getDate() === now.getDate() &&
     date.getMonth() === now.getMonth() &&
     date.getFullYear() === now.getFullYear()
   ) {
-    return date.toLocaleString("en-US", { hour: "numeric", minute: "2-digit", hour12: true })
+    return date.toLocaleString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   }
   return date.toLocaleString("en-US", {
     month: "long",
@@ -46,32 +46,36 @@ function formatFacebookDate(dateStr) {
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
-  })
+  });
 }
 
 export default function PostModal({ isOpen, onClose, post }) {
-  const { user } = useContext(AuthContext)
-  const [newComment, setNewComment] = useState("")
+  const { user } = useContext(AuthContext);
+  const [newComment, setNewComment] = useState("");
 
-  const { data: commentsData, isLoading, refetch } = usePostComments(post)
-  const createCommentMutation = useCreateComment()
+  if (!isOpen || !post) return null;
 
-  if (!isOpen || !post) return null
+  const { userId: postUser = {}, content = "", imageUrl = "", privacy = "public", createdAt, _id: postId } = post;
 
-  const { userId: postUser = {}, content = "", imageUrl = "", privacy = "public", createdAt, _id: postId } = post
+  const { icon, label } = getPrivacyIcon(privacy);
+  const username = postUser?.username || "Unknown User";
+  const profilePhoto = postUser?.profilePhoto?.trim()
+    ? getBackendImageUrl(postUser.profilePhoto)
+    : DEFAULT_AVATAR;
+  const dateStr = formatFacebookDate(createdAt);
+  const postImage = imageUrl?.trim() ? getBackendImageUrl(imageUrl) : "";
 
-  const { icon, label } = getPrivacyIcon(privacy)
-  const username = postUser?.username || "Unknown User"
-  const profilePhoto = postUser?.profilePhoto?.trim() ? getBackendImageUrl(postUser.profilePhoto) : DEFAULT_AVATAR
-  const dateStr = formatFacebookDate(createdAt)
-  const postImage = imageUrl?.trim() ? getBackendImageUrl(imageUrl) : ""
+  // ✅ Correct: pass postId to hook
+  const { data: commentsData, isLoading, refetch } = usePostComments(postId);
 
-  const allComments = commentsData?.data || []
-  const parentComments = allComments.filter((c) => !c.parentCommentId)
+  const allComments = commentsData?.data || [];
+  const parentComments = allComments.filter((c) => !c.parentCommentId);
+
+  const createCommentMutation = useCreateComment();
 
   const handlePostComment = () => {
-    if (!user) return toast.error("You must be logged in to comment")
-    if (!newComment.trim()) return toast.error("Comment cannot be empty")
+    if (!user) return toast.error("You must be logged in to comment");
+    if (!newComment.trim()) return toast.error("Comment cannot be empty");
 
     createCommentMutation.mutate(
       {
@@ -82,9 +86,8 @@ export default function PostModal({ isOpen, onClose, post }) {
       },
       {
         onSuccess: () => {
-          setNewComment("")
-          refetch()
-
+          setNewComment("");
+          refetch();
           if (postUser._id && postUser._id !== (user._id || user.id)) {
             createNotification({
               recipient: postUser._id,
@@ -92,13 +95,14 @@ export default function PostModal({ isOpen, onClose, post }) {
               message: `${user.username} commented on your post.`,
               relatedId: postId,
             }).catch((err) => {
-              console.error("Failed to create notification:", err)
-            })
+              console.error("Failed to create notification:", err);
+            });
           }
         },
-      },
-    )
-  }
+        onError: () => toast.error("Failed to post comment"),
+      }
+    );
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -106,9 +110,7 @@ export default function PostModal({ isOpen, onClose, post }) {
         {/* Header */}
         <div
           className="px-6 py-4 border-b border-gray-200 dark:border-gray-700"
-          style={{
-            background: `linear-gradient(135deg, ${PURPLE}10 0%, ${LAVENDER}10 100%)`,
-          }}
+          style={{ background: `linear-gradient(135deg, ${PURPLE}10 0%, ${LAVENDER}10 100%)` }}
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -140,18 +142,16 @@ export default function PostModal({ isOpen, onClose, post }) {
           </div>
         </div>
 
-        {/* Content Scrollable Area */}
+        {/* Scrollable content */}
         <div className="overflow-y-auto flex-grow px-6 py-4">
-          {/* Post Content */}
           <div className="mb-6">
             <div className="text-lg text-gray-900 dark:text-gray-100 whitespace-pre-line leading-relaxed mb-4">
               {content}
             </div>
 
-            {/* Image */}
             {postImage && (
               <div className="rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800">
-                <img src={postImage || "/placeholder.svg"} alt="Post" className="w-full max-h-[400px] object-contain" />
+                <img src={postImage} alt="Post" className="w-full max-h-[400px] object-contain" />
               </div>
             )}
           </div>
@@ -159,7 +159,7 @@ export default function PostModal({ isOpen, onClose, post }) {
           {/* Action Bar */}
           <div className="flex items-center justify-between py-4 border-y border-gray-200 dark:border-gray-700 mb-6">
             <div className="flex items-center gap-4">
-              <LikeButton postId={postId} postOwnerId={post.userId?._id} />
+              <LikeButton postId={postId} postOwnerId={postUser?._id} />
               <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200">
                 <FiMessageCircle size={18} />
                 <span className="font-medium">Comment</span>
@@ -221,8 +221,8 @@ export default function PostModal({ isOpen, onClose, post }) {
                 disabled={createCommentMutation.isLoading}
                 onKeyPress={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault()
-                    handlePostComment()
+                    e.preventDefault();
+                    handlePostComment();
                   }
                 }}
               />
@@ -242,5 +242,5 @@ export default function PostModal({ isOpen, onClose, post }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
