@@ -1,15 +1,17 @@
-import React, { useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { IconButton, Menu, MenuItem, Button } from "@mui/material";
-import { FiSettings, FiLogOut } from "react-icons/fi";
-import { useFollowUser, useUnfollowUser } from "../hooks/friendsHook";
-import { AuthContext } from "../auth/AuthProvider";
-import { toast } from "react-toastify";
-import { createNotificationService } from "../services/notificationService";
+"use client"
 
-const PURPLE = "#37225C";
-const LAVENDER = "#B8A6E6";
-const WHITE = "#FFFFFF";
+import { useContext } from "react"
+import { useNavigate } from "react-router-dom"
+import { IconButton, Menu, MenuItem, Button } from "@mui/material"
+import { FiSettings, FiLogOut, FiMessageCircle, FiUserPlus, FiUserMinus } from "react-icons/fi"
+import { useFollowUser, useUnfollowUser } from "../hooks/friendsHook"
+import { AuthContext } from "../auth/AuthProvider"
+import { toast } from "react-toastify"
+import { createNotificationService } from "../services/notificationService"
+
+const PURPLE = "#37225C"
+const LAVENDER = "#B8A6E6"
+const WHITE = "#FFFFFF"
 
 const ProfileActions = ({
   isOwnProfile,
@@ -21,13 +23,13 @@ const ProfileActions = ({
   viewedUserId,
   isFollowing,
 }) => {
-  const { user: currentUser } = useContext(AuthContext);
-  const followUser = useFollowUser();
-  const unfollowUser = useUnfollowUser();
-  const navigate = useNavigate();
+  const { user: currentUser } = useContext(AuthContext)
+  const followUser = useFollowUser()
+  const unfollowUser = useUnfollowUser()
+  const navigate = useNavigate()
 
   const handleFollow = () => {
-    if (!viewedUserId || !currentUser?._id || viewedUserId === currentUser._id) return;
+    if (!viewedUserId || !currentUser?._id || viewedUserId === currentUser._id) return
 
     followUser.mutate(viewedUserId, {
       onSuccess: () => {
@@ -37,71 +39,79 @@ const ProfileActions = ({
           message: `${currentUser.username} started following you.`,
           relatedId: currentUser._id,
         }).catch((err) => {
-          console.error("Failed to create follow notification:", err);
-        });
+          console.error("Failed to create follow notification:", err)
+        })
       },
-    });
-  };
+    })
+  }
 
   const handleUnfollow = () => {
-    if (!viewedUserId || !currentUser?._id || viewedUserId === currentUser._id) return;
-    unfollowUser.mutate(viewedUserId);
-  };
+    if (!viewedUserId || !currentUser?._id || viewedUserId === currentUser._id) return
+    unfollowUser.mutate(viewedUserId)
+  }
 
   const handleMessage = () => {
     if (!isFollowing) {
       toast.warning("You must follow this user to message them.", {
         position: "top-center",
         autoClose: 3000,
-      });
-      return;
+      })
+      return
     }
-    navigate(`/${viewedUserId}/message`);
-  };
+    navigate(`/${viewedUserId}/message`)
+  }
 
   const handleChangePassword = () => {
-    onCloseSettings(); // Close menu first
-    navigate("/changepassword");
-  };
+    onCloseSettings()
+    navigate("/changepassword")
+  }
 
   if (isOwnProfile) {
     return (
-      <div className="flex gap-3 items-center" style={{ marginBottom: 8 }}>
+      <div className="flex gap-3 items-center">
         <Button
           variant="outlined"
           onClick={onEditClick}
+          startIcon={<FiSettings size={18} />}
           sx={{
             textTransform: "none",
-            fontWeight: "bold",
+            fontWeight: "600",
             borderColor: PURPLE,
             color: PURPLE,
-            borderRadius: "8px",
+            borderRadius: "12px",
             paddingX: 3,
-            paddingY: 1.25,
-            fontSize: "1.1rem",
+            paddingY: 1.5,
+            fontSize: "1rem",
+            borderWidth: 2,
             "&:hover": {
-              backgroundColor: LAVENDER,
-              color: PURPLE,
+              backgroundColor: `${LAVENDER}20`,
               borderColor: LAVENDER,
+              transform: "translateY(-2px)",
+              boxShadow: `0 8px 25px ${PURPLE}30`,
             },
+            transition: "all 0.2s ease",
           }}
         >
-          Edit
+          Edit Profile
         </Button>
+
         <IconButton
           onClick={onSettingsClick}
           sx={{
+            backgroundColor: `${LAVENDER}15`,
             color: PURPLE,
+            width: 48,
+            height: 48,
             "&:hover": {
-              color: LAVENDER,
-              backgroundColor: "transparent",
+              backgroundColor: LAVENDER,
+              color: WHITE,
+              transform: "translateY(-2px)",
+              boxShadow: `0 8px 25px ${PURPLE}40`,
             },
-            marginBottom: 2,
-            fontSize: 28,
+            transition: "all 0.2s ease",
           }}
-          size="large"
         >
-          <FiSettings size={24} />
+          <FiSettings size={20} />
         </IconButton>
 
         <Menu
@@ -111,9 +121,10 @@ const ProfileActions = ({
           PaperProps={{
             sx: {
               bgcolor: "background.paper",
-              color: PURPLE,
-              borderRadius: 2,
-              boxShadow: `0 2px 8px ${LAVENDER}80`,
+              borderRadius: 3,
+              boxShadow: `0 10px 40px ${PURPLE}20`,
+              border: `1px solid ${LAVENDER}40`,
+              minWidth: 200,
             },
           }}
         >
@@ -121,54 +132,64 @@ const ProfileActions = ({
             onClick={handleChangePassword}
             sx={{
               color: PURPLE,
-              fontWeight: "bold",
+              fontWeight: "500",
+              py: 1.5,
+              px: 2,
               "&:hover": {
-                bgcolor: LAVENDER,
-                color: WHITE,
+                bgcolor: `${LAVENDER}15`,
+                color: PURPLE,
               },
             }}
           >
-            <FiSettings style={{ marginRight: 8 }} /> Change Password
+            <FiSettings style={{ marginRight: 12 }} />
+            Change Password
           </MenuItem>
           <MenuItem
             onClick={onLogout}
             sx={{
-              color: PURPLE,
-              fontWeight: "bold",
+              color: "#dc2626",
+              fontWeight: "500",
+              py: 1.5,
+              px: 2,
               "&:hover": {
-                bgcolor: LAVENDER,
-                color: WHITE,
+                bgcolor: "#fef2f2",
+                color: "#dc2626",
               },
             }}
           >
-            <FiLogOut style={{ marginRight: 8 }} /> Logout
+            <FiLogOut style={{ marginRight: 12 }} />
+            Logout
           </MenuItem>
         </Menu>
       </div>
-    );
+    )
   }
 
   return (
-    <div className="flex gap-3 items-center" style={{ marginBottom: 8 }}>
+    <div className="flex gap-3 items-center">
       {isFollowing ? (
         <Button
           variant="outlined"
           onClick={handleUnfollow}
           disabled={unfollowUser.isLoading}
+          startIcon={<FiUserMinus size={18} />}
           sx={{
-            borderColor: PURPLE,
-            color: PURPLE,
+            borderColor: "#dc2626",
+            color: "#dc2626",
             textTransform: "none",
-            fontWeight: "bold",
-            borderRadius: "8px",
+            fontWeight: "600",
+            borderRadius: "12px",
             paddingX: 3,
-            paddingY: 1.25,
-            fontSize: "1.1rem",
+            paddingY: 1.5,
+            fontSize: "1rem",
+            borderWidth: 2,
             "&:hover": {
-              backgroundColor: LAVENDER,
-              color: WHITE,
-              borderColor: LAVENDER,
+              backgroundColor: "#fef2f2",
+              borderColor: "#dc2626",
+              transform: "translateY(-2px)",
+              boxShadow: "0 8px 25px #dc262630",
             },
+            transition: "all 0.2s ease",
           }}
         >
           {unfollowUser.isLoading ? "Unfollowing..." : "Unfollow"}
@@ -178,20 +199,23 @@ const ProfileActions = ({
           variant="contained"
           onClick={handleFollow}
           disabled={followUser.isLoading}
+          startIcon={<FiUserPlus size={18} />}
           sx={{
-            backgroundColor: PURPLE,
+            background: `linear-gradient(135deg, ${PURPLE} 0%, ${LAVENDER} 100%)`,
             color: WHITE,
             textTransform: "none",
-            fontWeight: "bold",
-            borderRadius: "8px",
+            fontWeight: "600",
+            borderRadius: "12px",
             paddingX: 3,
-            paddingY: 1.25,
-            fontSize: "1.1rem",
-            boxShadow: `0 4px 10px ${LAVENDER}80`,
+            paddingY: 1.5,
+            fontSize: "1rem",
+            boxShadow: `0 4px 15px ${PURPLE}40`,
             "&:hover": {
-              backgroundColor: LAVENDER,
-              color: PURPLE,
+              background: `linear-gradient(135deg, ${LAVENDER} 0%, ${PURPLE} 100%)`,
+              transform: "translateY(-2px)",
+              boxShadow: `0 8px 25px ${PURPLE}50`,
             },
+            transition: "all 0.2s ease",
           }}
         >
           {followUser.isLoading ? "Following..." : "Follow"}
@@ -201,26 +225,30 @@ const ProfileActions = ({
       <Button
         variant="outlined"
         onClick={handleMessage}
+        startIcon={<FiMessageCircle size={18} />}
         sx={{
           borderColor: LAVENDER,
           color: PURPLE,
           textTransform: "none",
-          fontWeight: "bold",
-          borderRadius: "8px",
+          fontWeight: "600",
+          borderRadius: "12px",
           paddingX: 3,
-          paddingY: 1.25,
-          fontSize: "1.1rem",
+          paddingY: 1.5,
+          fontSize: "1rem",
+          borderWidth: 2,
           "&:hover": {
-            backgroundColor: LAVENDER,
-            color: WHITE,
-            borderColor: LAVENDER,
+            backgroundColor: `${LAVENDER}20`,
+            borderColor: PURPLE,
+            transform: "translateY(-2px)",
+            boxShadow: `0 8px 25px ${PURPLE}30`,
           },
+          transition: "all 0.2s ease",
         }}
       >
         Message
       </Button>
     </div>
-  );
-};
+  )
+}
 
-export default ProfileActions;
+export default ProfileActions

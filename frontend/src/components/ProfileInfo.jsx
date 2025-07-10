@@ -1,67 +1,114 @@
-import React, { useState, useEffect } from "react";
-import { FiMail, FiUser, FiCalendar } from "react-icons/fi";
-import { useFollowers, useFollowing } from "../hooks/friendsHook";
-import FollowersFollowingModal from "./FollowersFollowingModal";
+"use client"
+
+import { useState, useEffect } from "react"
+import { FiMail, FiCalendar, FiAward } from "react-icons/fi"
+import { useFollowers, useFollowing } from "../hooks/friendsHook"
+import FollowersFollowingModal from "./FollowersFollowingModal"
+
+const PURPLE = "#37225C"
+const LAVENDER = "#B8A6E6"
+const WHITE = "#FFFFFF"
 
 const ProfileInfo = ({ user, posts, postsLoading }) => {
-  const [followersOpen, setFollowersOpen] = useState(false);
-  const [followingOpen, setFollowingOpen] = useState(false);
+  const [followersOpen, setFollowersOpen] = useState(false)
+  const [followingOpen, setFollowingOpen] = useState(false)
+  const [followersList, setFollowersList] = useState([])
+  const [followingList, setFollowingList] = useState([])
 
-  const [followersList, setFollowersList] = useState([]);
-  const [followingList, setFollowingList] = useState([]);
-
-  const { data: followersData } = useFollowers(user._id);
-  const { data: followingData } = useFollowing(user._id);
+  const { data: followersData } = useFollowers(user._id)
+  const { data: followingData } = useFollowing(user._id)
 
   useEffect(() => {
     if (followersData?.data) {
-      setFollowersList(followersData.data);
+      setFollowersList(followersData.data)
     }
-  }, [followersData]);
+  }, [followersData])
 
   useEffect(() => {
     if (followingData?.data) {
-      setFollowingList(followingData.data);
+      setFollowingList(followingData.data)
     }
-  }, [followingData]);
+  }, [followingData])
 
   return (
-    <div className="flex-1 space-y-5 w-full">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-          {user.username}
-        </h1>
-        <p className="text-sm text-gray-500 dark:text-gray-300">
-          <FiUser className="inline mr-1" /> {user.role} | ID: {user.StudentId}
-        </p>
+    <div className="space-y-6 w-full">
+      {/* User Name & Role */}
+      <div className="space-y-2">
+        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">{user.username}</h1>
+        <div className="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+          <div
+            className="flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium"
+            style={{
+              backgroundColor: `${LAVENDER}20`,
+              color: PURPLE,
+            }}
+          >
+            <FiAward size={16} />
+            <span>{user.role}</span>
+          </div>
+          <span className="text-gray-400">•</span>
+          <span className="text-sm">ID: {user.StudentId}</span>
+        </div>
       </div>
 
-      <div className="flex gap-10 text-sm text-gray-700 dark:text-gray-300">
-        <span>
-          <b>{postsLoading ? "..." : posts?.data?.length || 0}</b> posts
-        </span>
-        <button onClick={() => setFollowersOpen(true)} className="hover:underline">
-          <b>{followersList.length}</b> followers
+      {/* Stats */}
+      <div className="flex gap-8 text-center sm:text-left">
+        <div className="group cursor-default">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white group-hover:scale-110 transition-transform">
+            {postsLoading ? "..." : posts?.data?.length || 0}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 font-medium">Posts</div>
+        </div>
+
+        <button onClick={() => setFollowersOpen(true)} className="group hover:scale-105 transition-all duration-200">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-purple-600">
+            {followersList.length}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 font-medium group-hover:text-purple-500">
+            Followers
+          </div>
         </button>
-        <button onClick={() => setFollowingOpen(true)} className="hover:underline">
-          <b>{followingList.length}</b> following
+
+        <button onClick={() => setFollowingOpen(true)} className="group hover:scale-105 transition-all duration-200">
+          <div className="text-2xl font-bold text-gray-900 dark:text-white group-hover:text-purple-600">
+            {followingList.length}
+          </div>
+          <div className="text-sm text-gray-600 dark:text-gray-400 font-medium group-hover:text-purple-500">
+            Following
+          </div>
         </button>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4 text-sm text-gray-800 dark:text-gray-300">
-        <p>
-          <FiMail className="inline mr-2 text-gray-500" />
-          <span className="font-medium">Email:</span> {user.email}
-        </p>
-        <p>
-          <FiCalendar className="inline mr-2 text-gray-500" />
-          <span className="font-medium">Joined:</span>{" "}
-          {new Date(user.createdAt).toLocaleDateString()}
-        </p>
+      {/* User Details */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+          <div className="p-2 rounded-lg" style={{ backgroundColor: `${LAVENDER}15` }}>
+            <FiMail size={16} style={{ color: PURPLE }} />
+          </div>
+          <div>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Email</span>
+            <div className="font-medium">{user.email}</div>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+          <div className="p-2 rounded-lg" style={{ backgroundColor: `${LAVENDER}15` }}>
+            <FiCalendar size={16} style={{ color: PURPLE }} />
+          </div>
+          <div>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Joined</span>
+            <div className="font-medium">{new Date(user.createdAt).toLocaleDateString()}</div>
+          </div>
+        </div>
+
         {user.bio && (
-          <p className="md:col-span-2">
-            <span className="font-medium">Bio:</span> {user.bio}
-          </p>
+          <div
+            className="mt-4 p-4 rounded-xl bg-gray-50 dark:bg-gray-700/50 border-l-4"
+            style={{ borderColor: LAVENDER }}
+          >
+            <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Bio</div>
+            <p className="text-gray-800 dark:text-gray-200 leading-relaxed">{user.bio}</p>
+          </div>
         )}
       </div>
 
@@ -79,7 +126,7 @@ const ProfileInfo = ({ user, posts, postsLoading }) => {
         users={followingList}
       />
     </div>
-  );
-};
+  )
+}
 
-export default ProfileInfo;
+export default ProfileInfo
