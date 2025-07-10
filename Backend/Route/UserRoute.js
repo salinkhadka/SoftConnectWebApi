@@ -15,6 +15,7 @@ router.put("/:id", authenticateUser,fileUpload.single('profilePhoto'), userContr
 router.delete("/:id", authenticateUser, isAdmin, userController.deleteOneUser); // Admin-only
 router.post("/request-reset", userController.sendResetLink);
 router.post("/reset-password/:token", userController.resetPassword);
+router.post("/verify-password",userController.verifyPassword)
 
 router.post("/uploadImg",fileUpload.single("profilePhoto"),userController.uploadImage);
 

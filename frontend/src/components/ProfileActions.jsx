@@ -5,7 +5,7 @@ import { FiSettings, FiLogOut } from "react-icons/fi";
 import { useFollowUser, useUnfollowUser } from "../hooks/friendsHook";
 import { AuthContext } from "../auth/AuthProvider";
 import { toast } from "react-toastify";
-import { createNotificationService } from "../services/notificationService"; // <-- added
+import { createNotificationService } from "../services/notificationService";
 
 const PURPLE = "#37225C";
 const LAVENDER = "#B8A6E6";
@@ -31,7 +31,6 @@ const ProfileActions = ({
 
     followUser.mutate(viewedUserId, {
       onSuccess: () => {
-        // Create notification for the followed user
         createNotificationService({
           recipient: viewedUserId,
           type: "follow",
@@ -58,6 +57,11 @@ const ProfileActions = ({
       return;
     }
     navigate(`/${viewedUserId}/message`);
+  };
+
+  const handleChangePassword = () => {
+    onCloseSettings(); // Close menu first
+    navigate("/changepassword");
   };
 
   if (isOwnProfile) {
@@ -113,6 +117,19 @@ const ProfileActions = ({
             },
           }}
         >
+          <MenuItem
+            onClick={handleChangePassword}
+            sx={{
+              color: PURPLE,
+              fontWeight: "bold",
+              "&:hover": {
+                bgcolor: LAVENDER,
+                color: WHITE,
+              },
+            }}
+          >
+            <FiSettings style={{ marginRight: 8 }} /> Change Password
+          </MenuItem>
           <MenuItem
             onClick={onLogout}
             sx={{
