@@ -1,29 +1,28 @@
-import React, { useContext } from "react";
-import { useFormik } from "formik";
-import * as Yup from "yup";
-import { useLogin } from "../hooks/useLogin";
-import { AuthContext } from "../auth/AuthProvider";
-import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
-import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+"use client"
+
+import { useContext } from "react"
+import { useFormik } from "formik"
+import * as Yup from "yup"
+import { useLogin } from "../hooks/useLogin"
+import { AuthContext } from "../auth/AuthProvider"
+import { toast } from "react-toastify"
+import { Link } from "react-router-dom"
+import logo from "../assets/logo.png"
+import { useNavigate } from "react-router-dom"
+
+const PURPLE = "#37225C"
+const LAVENDER = "#B8A6E6"
+const WHITE = "#FFFFFF"
 
 export default function LoginForm() {
-  const { mutate, isPending, isSuccess, data } = useLogin();
-  const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
-
-
+  const { mutate, isPending, isSuccess, data } = useLogin()
+  const { user } = useContext(AuthContext)
+  const navigate = useNavigate()
 
   const validationSchema = Yup.object({
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
-  });
+    email: Yup.string().email("Invalid email address").required("Email is required"),
+    password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  })
 
   const formik = useFormik({
     initialValues: { email: "", password: "" },
@@ -32,97 +31,205 @@ export default function LoginForm() {
       mutate(values, {
         onSuccess: () => toast.success("Login successful!"),
         onError: (error) => toast.error(error?.message || "Login failed!"),
-      });
+      })
     },
-  });
-  
+  })
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-2 py-6">
-      <div className="flex flex-col md:flex-row w-full max-w-5xl min-h-[650px] shadow-2xl rounded-3xl bg-gradient-to-br from-[#31125f] via-[#502580] to-[#a084e8] border border-gray-100 transition-all duration-300">
-        {/* Left - Logo Panel */}
-        <div className="flex flex-col items-center justify-center w-full md:w-1/2 py-14 px-6 md:px-10">
-          <img
-            src={logo}
-            alt="Logo"
-            className="rounded-2xl w-40 h-40 object-contain border-4 border-white shadow-lg mb-4"
-          />
-          <span className="mt-4 font-extrabold text-4xl text-white tracking-wide text-center">
-            SoftConnect
-          </span>
-          <span className="mt-2 text-lg text-white/80 font-semibold text-center">
-            Welcome to SoftConnect!
-          </span>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 px-4 py-8">
+      <div className="flex flex-col lg:flex-row w-full max-w-6xl min-h-[700px] shadow-2xl rounded-3xl overflow-hidden bg-white dark:bg-gray-800 transition-all duration-300">
+        {/* Left Panel - Logo & Branding */}
+        <div
+          className="flex flex-col items-center justify-center w-full lg:w-1/2 py-16 px-8 text-center"
+          style={{
+            background: `linear-gradient(135deg, ${PURPLE} 0%, ${LAVENDER} 100%)`,
+          }}
+        >
+          <div className="relative mb-8">
+            <div className="absolute inset-0 bg-white/20 rounded-full blur-xl"></div>
+            <img
+              src={logo || "/placeholder.svg"}
+              alt="SoftConnect Logo"
+              className="relative rounded-2xl w-32 h-32 sm:w-40 sm:h-40 object-contain border-4 border-white/30 shadow-2xl backdrop-blur-sm"
+            />
+          </div>
+
+          <h1 className="font-bold text-4xl sm:text-5xl text-white mb-4 tracking-tight">SoftConnect</h1>
+          <p className="text-lg sm:text-xl text-white/90 font-medium max-w-md leading-relaxed">
+            Connect, Share, and Grow with Your Academic Community
+          </p>
+
+          <div className="mt-8 flex space-x-2">
+            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-white/40 rounded-full animate-pulse delay-100"></div>
+            <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse delay-200"></div>
+          </div>
         </div>
-        {/* Right - Form */}
-        <div className="flex-1 flex flex-col justify-center p-8 md:p-16 bg-white rounded-r-3xl">
+
+        {/* Right Panel - Login Form */}
+        <div className="flex-1 flex flex-col justify-center p-8 sm:p-12 lg:p-16 bg-white dark:bg-gray-800">
           <div className="mx-auto w-full max-w-md">
-            <h2 className="text-2xl font-bold text-center mb-6 text-[#502580] tracking-tight">
-              Log in to your account
-            </h2>
-            <form onSubmit={formik.handleSubmit} className="space-y-5">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="username"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.email}
-                className={`w-full border rounded-lg px-4 py-2 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 text-sm ${
-                  formik.touched.email && formik.errors.email
-                    ? "border-pink-400 focus:ring-pink-300"
-                    : "border-gray-200 focus:ring-[#a084e8]"
-                }`}
-                placeholder="Email"
-              />
-              {formik.touched.email && formik.errors.email && (
-                <p className="mt-1 text-pink-500 text-xs">{formik.errors.email}</p>
-              )}
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.password}
-                className={`w-full border rounded-lg px-4 py-2 bg-gray-50 shadow-sm focus:outline-none focus:ring-2 text-sm ${
-                  formik.touched.password && formik.errors.password
-                    ? "border-pink-400 focus:ring-pink-300"
-                    : "border-gray-200 focus:ring-[#a084e8]"
-                }`}
-                placeholder="Password"
-              />
-              {formik.touched.password && formik.errors.password && (
-                <p className="mt-1 text-pink-500 text-xs">{formik.errors.password}</p>
-              )}
-              <button
-                type="submit"
-                disabled={isPending}
-                className="w-full py-2 rounded-xl bg-gradient-to-r from-[#502580] via-[#a084e8] to-[#ed64a6] hover:from-[#6c36a6] hover:to-[#d53f8c] text-white font-semibold text-lg shadow transition-all duration-150"
-              >
-                {isPending ? "Logging in..." : "Log in"}
-              </button>
-              <div className="text-right mt-2">
-                <Link to="/forgot-password" className="text-xs text-[#502580] hover:underline">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-2" style={{ color: PURPLE }}>
+                Welcome
+              </h2>
+              <p className="text-gray-600 dark:text-gray-300">Sign in to your account to continue</p>
+            </div>
+
+            <form onSubmit={formik.handleSubmit} className="space-y-6">
+              <div className="space-y-1">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="username"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.email}
+                  className={`w-full px-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-gray-700 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 ${
+                    formik.touched.email && formik.errors.email
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                      : `border-gray-200 dark:border-gray-600 focus:ring-2`
+                  }`}
+                  style={{
+                    focusBorderColor: LAVENDER,
+                    focusRingColor: `${LAVENDER}40`,
+                  }}
+                  placeholder="Enter your email"
+                />
+                {formik.touched.email && formik.errors.email && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <span className="mr-1">⚠️</span>
+                    {formik.errors.email}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.password}
+                  className={`w-full px-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-gray-700 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 ${
+                    formik.touched.password && formik.errors.password
+                      ? "border-red-300 focus:border-red-500 focus:ring-red-200"
+                      : "border-gray-200 dark:border-gray-600"
+                  }`}
+                  placeholder="Enter your password"
+                />
+                {formik.touched.password && formik.errors.password && (
+                  <p className="text-red-500 text-sm mt-1 flex items-center">
+                    <span className="mr-1">⚠️</span>
+                    {formik.errors.password}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    className="h-4 w-4 rounded border-gray-300 focus:ring-2"
+                    style={{ accentColor: PURPLE }}
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                    Remember me
+                  </label>
+                </div>
+                <Link
+                  to="/forgot-password"
+                  className="text-sm font-medium hover:underline transition-colors"
+                  style={{ color: PURPLE }}
+                >
                   Forgot password?
                 </Link>
               </div>
+
+              <button
+                type="submit"
+                disabled={isPending}
+                className="w-full py-3 px-4 rounded-xl font-semibold text-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02] hover:shadow-xl disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none"
+                style={{
+                  background: `linear-gradient(135deg, ${PURPLE} 0%, ${LAVENDER} 100%)`,
+                  color: WHITE,
+                }}
+              >
+                {isPending ? (
+                  <span className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Signing in...
+                  </span>
+                ) : (
+                  "Sign In"
+                )}
+              </button>
             </form>
-            {/* Sign Up link */}
-            <div className="bg-white border border-gray-100 rounded-xl shadow-sm py-4 mt-6 text-center text-sm">
-              Don&apos;t have an account?{" "}
+
+            {/* Sign Up Link */}
+            <div className="mt-8 text-center">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200 dark:border-gray-600"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-white dark:bg-gray-800 text-gray-500">New to SoftConnect?</span>
+                </div>
+              </div>
+
               <Link
                 to="/signup"
-                className="text-[#502580] hover:text-pink-600 font-semibold underline"
+                className="mt-4 inline-flex items-center justify-center w-full py-3 px-4 rounded-xl border-2 font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+                style={{
+                  borderColor: PURPLE,
+                  color: PURPLE,
+                  backgroundColor: "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = LAVENDER
+                  e.target.style.color = WHITE
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent"
+                  e.target.style.color = PURPLE
+                }}
               >
-                Sign up
+                Create Account
               </Link>
             </div>
           </div>
         </div>
       </div>
     </div>
-  );
+  )
 }
