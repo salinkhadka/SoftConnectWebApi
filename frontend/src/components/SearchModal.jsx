@@ -60,8 +60,18 @@ const SearchPanel = ({ open, onClose }) => {
           transition: "transform 0.3s ease, opacity 0.3s ease",
           transform: open ? "translateX(0)" : "translateX(-20px)",
           opacity: open ? 1 : 0,
-          overflowY: "auto",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+
+          // Dark mode background override
+          "&.dark": {
+            background: `linear-gradient(145deg, #1F2937 0%, #111827 100%)`, // Tailwind slate-800 to slate-900
+            borderRight: `1px solid ${LAVENDER}40`,
+            color: WHITE,
+          },
         }}
+        className="dark:bg-gray-900 dark:border-gray-700"
       >
         {/* Header */}
         <div
@@ -103,7 +113,8 @@ const SearchPanel = ({ open, onClose }) => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name or email..."
-              className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 shadow-sm transition-all duration-200"
+              className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 shadow-sm transition-all duration-200
+                         dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:border-gray-600 dark:focus:border-purple-600 dark:focus:ring-purple-600"
               style={{
                 borderColor: `${LAVENDER}60`,
               }}
@@ -112,7 +123,14 @@ const SearchPanel = ({ open, onClose }) => {
         </div>
 
         {/* Results */}
-        <div className="px-6 pb-6">
+        <div
+          className="px-6 pb-6"
+          style={{
+            flexGrow: 1,
+            overflowY: "auto",
+            maxHeight: "calc(100% - 148px)", // header + search input + padding approx
+          }}
+        >
           <h3 className="text-lg font-semibold mb-4" style={{ color: PURPLE }}>
             Search Results
           </h3>
@@ -120,11 +138,14 @@ const SearchPanel = ({ open, onClose }) => {
           {isLoading && (
             <div className="space-y-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="flex items-center gap-3 p-3 animate-pulse">
-                  <div className="w-16 h-16 bg-gray-300 rounded-full"></div>
+                <div
+                  key={i}
+                  className="flex items-center gap-3 p-3 animate-pulse"
+                >
+                  <div className="w-12 h-12 bg-gray-300 rounded-full dark:bg-gray-700"></div>
                   <div className="flex-1">
-                    <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
-                    <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+                    <div className="h-4 bg-gray-300 rounded w-3/4 mb-2 dark:bg-gray-700"></div>
+                    <div className="h-3 bg-gray-300 rounded w-1/2 dark:bg-gray-700"></div>
                   </div>
                 </div>
               ))}
@@ -134,40 +155,51 @@ const SearchPanel = ({ open, onClose }) => {
           {error && (
             <div className="text-center py-8">
               <div className="text-red-500 text-4xl mb-2">⚠️</div>
-              <p className="text-red-600">Failed to load users</p>
+              <p className="text-red-600 dark:text-red-400">Failed to load users</p>
             </div>
           )}
 
           {!isLoading && !error && users.length === 0 && searchTerm && (
             <div className="text-center py-8">
-              <FiUser size={48} className="mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-500">No users found</p>
+              <FiUser
+                size={48}
+                className="mx-auto mb-4 text-gray-400 dark:text-gray-500"
+              />
+              <p className="text-gray-500 dark:text-gray-400">No users found</p>
             </div>
           )}
 
           {!searchTerm && (
             <div className="text-center py-8">
-              <FiSearch size={48} className="mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-500">Start typing to search for users</p>
+              <FiSearch
+                size={48}
+                className="mx-auto mb-4 text-gray-400 dark:text-gray-500"
+              />
+              <p className="text-gray-500 dark:text-gray-400">
+                Start typing to search for users
+              </p>
             </div>
           )}
 
-          {/* User List */}
-          <div className="space-y-3 max-h-[32rem] overflow-y-auto pr-2">
+          <div className="space-y-2">
             {users.map((user) => (
               <div
                 key={user._id}
                 onClick={() => handleUserClick(user._id)}
-                className="flex items-center gap-5 p-5 rounded-3xl hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all duration-200 group hover:scale-[1.015]"
+                className="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all duration-200 group hover:scale-[1.02]"
               >
                 <div className="relative">
                   <img
                     src={
                       getBackendImageUrl(user.profilePhoto) ||
-                      `https://ui-avatars.com/api/?background=${LAVENDER.slice(1)}&color=${PURPLE.slice(1)}&name=${user.username}`
+                      `https://ui-avatars.com/api/?background=${LAVENDER.slice(
+                        1,
+                      ) || "/placeholder.svg"}&color=${PURPLE.slice(
+                        1,
+                      )}&name=${user.username}`
                     }
                     alt={user.username}
-                    className="w-16 h-16 rounded-full object-cover border-2 group-hover:scale-110 transition-transform duration-200"
+                    className="w-12 h-12 rounded-full object-cover border-2 group-hover:scale-110 transition-transform duration-200"
                     style={{ borderColor: LAVENDER }}
                   />
                   <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
@@ -175,11 +207,11 @@ const SearchPanel = ({ open, onClose }) => {
 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-semibold text-lg text-gray-900 dark:text-white truncate group-hover:text-purple-600 transition-colors">
+                    <h4 className="font-semibold text-gray-900 dark:text-white truncate group-hover:text-purple-600 transition-colors">
                       {user.username}
                     </h4>
                     <div
-                      className="px-3 py-1 rounded-full text-sm font-medium"
+                      className="px-2 py-1 rounded-full text-xs font-medium"
                       style={{
                         backgroundColor: `${LAVENDER}20`,
                         color: PURPLE,
@@ -188,8 +220,8 @@ const SearchPanel = ({ open, onClose }) => {
                       {user.role}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-base text-gray-600 dark:text-gray-400">
-                    <FiMail size={16} />
+                  <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                    <FiMail size={14} />
                     <span className="truncate">{user.email}</span>
                   </div>
                 </div>
