@@ -2,11 +2,7 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    userId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+
     email: {
       type: String,
       required: true,
@@ -22,10 +18,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    usertype: {
-      type: String,
-      default: 'normal',
-    },
     profilePhoto: {
       type: String, // URL or file path
       default: '',
@@ -38,6 +30,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: 'normal',
     },
+    // isVerified: { type: Boolean, default: false }, // if you implement email verification
+    followersCount: { type: Number, default: 0 },  // if you want faster follower count
+    followingCount: { type: Number, default: 0 },  // same for following
+
   },
   {
     timestamps: true,
