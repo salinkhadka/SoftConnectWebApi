@@ -117,10 +117,10 @@ function PostCard({ post, openModal }) {
           <CommentCount postId={post._id} openPostModal={() => openModal(post)} />
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+        {/* <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
           <FiHeart size={16} />
           <span>Share</span>
-        </div>
+        </div> */}
       </div>
     </div>
   )
