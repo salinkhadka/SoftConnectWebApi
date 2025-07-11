@@ -1,7 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
-
 // Pages & Layouts
 import LoginPage from '../pages/LoginPage';
 import SignupPage from '../pages/SignupPage';
@@ -18,6 +17,7 @@ import NormalUserRoute from './NormalUserRoute';
 import PostPageAdmin from '../pages/Admin/PostPageAdmin';
 import AddPostComponent from '../components/Admin/AddPost';
 import UserPageAdmin from '../pages/Admin/UserPageAdmin';
+import AnalyticsPage from '../components/AnalyticsPage';
 
 // User Components
 import FeedComponent from '../components/FeedComponent';
@@ -31,28 +31,23 @@ import NotificationPage from '../components/NotificationPage';
 import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
 import ChangePassword from '../components/ChangePassword';
-import AnalyticsPage from '../components/AnalyticsPage';
 
 export default function AppRouter() {
   return (
     <BrowserRouter>
       <Routes>
 
+        {/* Public password reset route */}
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        
+        <Route path="/changepassword" element={<ChangePassword />} />
 
         {/* Guest-only Routes */}
         <Route element={<GuestRoute />}>
-          {/* Routes with layout */}
           <Route element={<UserLayout />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
-
           </Route>
-
-          {/* Standalone public route without layout */}
-          
         </Route>
 
         {/* Normal User Routes */}
@@ -67,7 +62,7 @@ export default function AppRouter() {
               <Route path="/:userid" element={<UserProfile />} />
               <Route path="/sugesstion" element={<UserProfile />} />
               <Route path="/:userid/message" element={<MessagePage />} />
-              <Route path="/changepassword" element={<ChangePassword />} />
+              {/* <Route path="/changepassword" element={<ChangePassword />} /> */}
             </Route>
           </Route>
         </Route>
@@ -80,7 +75,7 @@ export default function AppRouter() {
             <Route path="posts" element={<PostPageAdmin />} />
             <Route path="addPost" element={<AddPostComponent />} />
             <Route path="analytics" element={<AnalyticsPage />} />
-
+            {/* <Route path="changepasswordadmin" element={<ChangePassword />} /> */}
             <Route path="*" element={<div>Admin Page Not Found</div>} />
           </Route>
         </Route>
