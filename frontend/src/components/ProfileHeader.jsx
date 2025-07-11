@@ -26,11 +26,14 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
 
   const { data: posts, isLoading: postsLoading } = useUserPosts(user?._id)
   const { data: followingData, isLoading: followingLoading } = useFollowing(loggedInUser?._id)
-  const { data: followersData } = useFollowers(user._id)
-  const { data: userFollowingData } = useFollowing(user._id)
+  const { data: followersData } = useFollowers(user?._id)
+  const { data: userFollowingData } = useFollowing(user?._id)
 
   const isFollowing =
-    !followingLoading && followingData?.data?.some((follow) => follow.followee._id.toString() === user._id.toString())
+    !followingLoading &&
+    followingData?.data?.some(
+      (follow) => follow.followee?._id?.toString() === user?._id?.toString()
+    )
 
   const followersList = followersData?.data || []
   const followingList = userFollowingData?.data || []
@@ -63,7 +66,9 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                   <div className="p-2 rounded-full bg-white/20 backdrop-blur-sm">
                     <FiUser size={20} className="text-white" />
                   </div>
-                  <h1 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">{user.username}</h1>
+                  <h1 className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg">
+                    {user?.username || "User"}
+                  </h1>
                 </div>
 
                 {/* Role */}
@@ -79,7 +84,7 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                       textShadow: "0 2px 4px rgba(0,0,0,0.3)",
                     }}
                   >
-                    {user.role}
+                    {user?.role || "N/A"}
                   </div>
                 </div>
               </div>
@@ -104,7 +109,9 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
           </div>
 
           {/* White Content Section - 70% */}
-          <div className="relative bg-white dark:bg-gray-800 px-6 sm:px-8 lg:px-12 pt-16 pb-8">
+          <div className="relative bg-white dark:bg-gray-800 px-4 sm:px-6 lg:px-8 pt-2 pb-1">
+
+
             {/* Profile Picture - Overlapping both sections */}
             <div className="absolute left-8 -top-20 z-10">
               <ProfileImage
@@ -118,17 +125,21 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
             </div>
 
             {/* Main Content */}
-            <div className="ml-0 lg:ml-48 space-y-6">
+            <div className="ml-0 lg:ml-48 space-y-3">
+
               {/* Top Row - Stats and Info */}
               <div className="flex flex-col lg:flex-row gap-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                 {/* Left Side - Stats (Smaller) */}
-                <div className="flex gap-6">
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-gray-900 dark:text-white">
+                <div className="flex gap-6 items-center">
+                  <button
+                    className="text-center hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors"
+                    disabled
+                  >
+                    <div className="text-xl font-bold text-gray-900 dark:text-white hover:text-purple-600 transition-colors">
                       {postsLoading ? "..." : posts?.data?.length || 0}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Posts</div>
-                  </div>
+                  </button>
 
                   <button
                     onClick={() => setFollowersOpen(true)}
@@ -151,6 +162,7 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                   </button>
                 </div>
 
+
                 {/* Right Side - User Info (Horizontal) */}
                 <div className="flex-1 flex flex-wrap gap-6 lg:justify-end">
                   {/* Student ID */}
@@ -160,7 +172,7 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Student ID</p>
-                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{user.StudentId}</p>
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white">{user?.StudentId || "N/A"}</p>
                     </div>
                   </div>
 
@@ -171,7 +183,7 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                     </div>
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Email</p>
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">{user.email}</p>
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.email || "N/A"}</p>
                     </div>
                   </div>
 
@@ -183,10 +195,12 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                     <div>
                       <p className="text-xs text-gray-500 dark:text-gray-400">Joined</p>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
-                        {new Date(user.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          year: "numeric",
-                        })}
+                        {user?.createdAt
+                          ? new Date(user.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            year: "numeric",
+                          })
+                          : "N/A"}
                       </p>
                     </div>
                   </div>
@@ -200,7 +214,7 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                   <h3 className="font-semibold text-gray-900 dark:text-white">About</h3>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-6 min-h-[120px]">
-                  {user.bio ? (
+                  {user?.bio ? (
                     <p className="text-gray-800 dark:text-gray-200 leading-relaxed text-base">{user.bio}</p>
                   ) : (
                     <p className="text-gray-500 dark:text-gray-400 italic text-base">

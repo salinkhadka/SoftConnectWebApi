@@ -375,7 +375,8 @@ export default function UserPostsGrid({ posts, user, onUpdate, onDelete }) {
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white">Your Posts</h3>
 
             {/* Post Grid - 2 columns, bigger cards */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
               {postsArray.map((post) => {
                 const { icon, label } = getPrivacyIcon(post.privacy)
                 const username = post.userId?.username || user?.username || "Unknown User"
