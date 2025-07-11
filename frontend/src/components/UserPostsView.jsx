@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { getBackendImageUrl } from "../utils/getBackendImageUrl";
 import { FiGlobe, FiLock, FiUsers } from "react-icons/fi";
 import LikeButton from "../components/LikeButton";
 import CommentCount from "./CommentButton";
 import PostModalStandalone from "../components/PostModalStandalone";
 import { useNavigate } from "react-router-dom";
-
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
@@ -46,25 +45,21 @@ function formatFacebookDate(dateStr) {
   });
 }
 
-export default function UserPostsGrid({ posts, user }) {
-  const [modalOpen, setModalOpen] = useState(false);
+export default function UserPostsGrid({ posts, user, columns = 3 }) {
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [modalPost, setModalPost] = React.useState(null);
   const navigate = useNavigate();
 
-  const [modalPost, setModalPost] = useState(null);
-
-  // Open post modal on card click
   const openPostModal = (post) => {
     setModalPost(post);
     setModalOpen(true);
   };
 
-  // Close post modal
   const closePostModal = () => {
     setModalPost(null);
     setModalOpen(false);
   };
 
-  // Handle different data structures - posts might be nested in data property
   const postsArray = Array.isArray(posts) ? posts : posts?.data || [];
 
   if (!postsArray || postsArray.length === 0)
@@ -78,11 +73,9 @@ export default function UserPostsGrid({ posts, user }) {
 
   return (
     <>
-      {/* Post Modal */}
       <PostModalStandalone post={modalPost} isOpen={modalOpen} onClose={closePostModal} />
 
-      {/* Post Grid - Removed mt-10 px-4 to avoid double spacing */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className={`grid gap-6 grid-cols-1 sm:grid-cols-2 ${columns === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'}`}>
         {postsArray.map((post) => {
           const { icon, label } = getPrivacyIcon(post.privacy);
           const username = post.userId?.username || user?.username || "Unknown User";
@@ -100,7 +93,6 @@ export default function UserPostsGrid({ posts, user }) {
               className="bg-white dark:bg-[#1e1b29] rounded-2xl shadow p-4 flex flex-col border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => openPostModal(post)}
             >
-              {/* User Info */}
               <div className="flex items-center mb-2 gap-3">
                 <img
                   src={profilePhoto}
@@ -109,7 +101,15 @@ export default function UserPostsGrid({ posts, user }) {
                 />
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900 dark:text-white">{username}</span>
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (post.userId?._id) navigate(`/${post.userId._id}`);
+                      }}
+                      className="font-semibold text-gray-900 dark:text-white hover:underline cursor-pointer"
+                    >
+                      {username}
+                    </span>
                   </div>
                   <div className="flex items-center text-xs text-gray-500 dark:text-gray-300 gap-1">
                     <span>{createdAt}</span>
@@ -120,12 +120,10 @@ export default function UserPostsGrid({ posts, user }) {
                 </div>
               </div>
 
-              {/* Content */}
               <div className="text-base text-gray-900 dark:text-gray-100 whitespace-pre-line mb-2">
                 {post.content}
               </div>
 
-              {/* Image */}
               {post.imageUrl && (
                 <div className="overflow-hidden rounded-xl mb-2 bg-black flex items-center justify-center w-full aspect-square">
                   <img
@@ -136,12 +134,8 @@ export default function UserPostsGrid({ posts, user }) {
                 </div>
               )}
 
-              {/* Like/Comment Actions */}
               <div className="flex justify-between items-center mt-auto pt-2 border-t border-gray-100 dark:border-gray-700">
-                <div
-                  className="py-2 px-3"
-                  onClick={(e) => e.stopPropagation()}
-                >
+                <div className="py-2 px-3" onClick={(e) => e.stopPropagation()}>
                   <LikeButton postId={post._id} postOwnerId={post.userId?._id} />
                 </div>
                 <div onClick={(e) => e.stopPropagation()}>

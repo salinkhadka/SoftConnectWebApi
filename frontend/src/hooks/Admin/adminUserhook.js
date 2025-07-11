@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../../auth/AuthProvider"; // Uncomment this!
+import axios from "axios";
 import {
   getAllUsersService,
   getUserByIdService,
@@ -60,6 +61,20 @@ export const useUser = (id) =>
       toast.error(err?.message || "Failed to load user");
     },
   });
+
+
+export const useGetUsersAdmin = ({ search = "" }) => {
+  return useQuery({
+    queryKey: ["usersAdmin", search],
+    queryFn: async () => {
+      const response = await axios.get("http://localhost:2000/user/getAll", {
+        params: { search },
+      });
+      return response.data.data; // adjust if needed
+    },
+    keepPreviousData: true,
+  });
+};
 
 // Update user
 export const useUpdateUser = () => {

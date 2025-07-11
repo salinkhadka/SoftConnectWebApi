@@ -161,7 +161,7 @@ exports.loginUser = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    const { page = 1, limit = 2, search = "" } = req.query;
+    const { page = 1, limit = 10, search = "" } = req.query;
     const filter = {};
 
     if (search) {
@@ -175,7 +175,7 @@ exports.getUsers = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const users = await User.find(filter)
-      .select("username email profilePhoto") // Only return needed fields
+      .select("username email profilePhoto role createdAt updatedAt") // Only return needed fields
       .skip(skip)
       .limit(Number(limit));
 
