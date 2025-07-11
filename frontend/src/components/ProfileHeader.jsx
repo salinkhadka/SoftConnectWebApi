@@ -109,7 +109,9 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
           </div>
 
           {/* White Content Section - 70% */}
-          <div className="relative bg-white dark:bg-gray-800 px-6 sm:px-8 lg:px-12 pt-16 pb-8">
+          <div className="relative bg-white dark:bg-gray-800 px-4 sm:px-6 lg:px-8 pt-2 pb-1">
+
+
             {/* Profile Picture - Overlapping both sections */}
             <div className="absolute left-8 -top-20 z-10">
               <ProfileImage
@@ -123,17 +125,21 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
             </div>
 
             {/* Main Content */}
-            <div className="ml-0 lg:ml-48 space-y-6">
+            <div className="ml-0 lg:ml-48 space-y-3">
+
               {/* Top Row - Stats and Info */}
               <div className="flex flex-col lg:flex-row gap-6 pb-6 border-b border-gray-200 dark:border-gray-700">
                 {/* Left Side - Stats (Smaller) */}
-                <div className="flex gap-6">
-                  <div className="text-center">
-                    <div className="text-xl font-bold text-gray-900 dark:text-white">
+                <div className="flex gap-6 items-center">
+                  <button
+                    className="text-center hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg p-2 transition-colors"
+                    disabled
+                  >
+                    <div className="text-xl font-bold text-gray-900 dark:text-white hover:text-purple-600 transition-colors">
                       {postsLoading ? "..." : posts?.data?.length || 0}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">Posts</div>
-                  </div>
+                  </button>
 
                   <button
                     onClick={() => setFollowersOpen(true)}
@@ -155,6 +161,7 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                     <div className="text-xs text-gray-600 dark:text-gray-400">Following</div>
                   </button>
                 </div>
+
 
                 {/* Right Side - User Info (Horizontal) */}
                 <div className="flex-1 flex flex-wrap gap-6 lg:justify-end">
@@ -190,9 +197,9 @@ const ProfileHeader = ({ user, onUpdateUser }) => {
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {user?.createdAt
                           ? new Date(user.createdAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              year: "numeric",
-                            })
+                            month: "short",
+                            year: "numeric",
+                          })
                           : "N/A"}
                       </p>
                     </div>
