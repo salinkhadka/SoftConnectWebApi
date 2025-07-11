@@ -6,6 +6,9 @@ import { FiCheckCircle, FiAlertCircle, FiInfo, FiX } from "react-icons/fi"
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
 const WHITE = "#FFFFFF"
+const ERROR_BG = "#4A1C1C"
+const ERROR_BORDER = "#FF6B6B"
+const ERROR_SHADOW = "rgba(255, 107, 107, 0.25)"
 
 const ToastContext = createContext()
 
@@ -19,7 +22,7 @@ export const useToast = () => {
 
 const Toast = ({ toast, onRemove }) => {
   const getIcon = () => {
-    const iconStyle = { color: LAVENDER }
+    const iconStyle = { color: toast.type === "error" ? ERROR_BORDER : LAVENDER }
     switch (toast.type) {
       case "success":
         return <FiCheckCircle size={20} style={iconStyle} />
@@ -31,6 +34,13 @@ const Toast = ({ toast, onRemove }) => {
     }
   }
 
+  const backgroundColor = toast.type === "error" ? ERROR_BG : PURPLE
+  const borderLeftColor = toast.type === "error" ? ERROR_BORDER : LAVENDER
+  const boxShadow =
+    toast.type === "error"
+      ? `0 8px 32px ${ERROR_SHADOW}`
+      : `0 8px 32px ${PURPLE}25`
+
   return (
     <div
       className={`
@@ -40,11 +50,11 @@ const Toast = ({ toast, onRemove }) => {
         animate-in slide-in-from-right-full
       `}
       style={{
-        backgroundColor: PURPLE,
+        backgroundColor,
         color: WHITE,
-        borderLeftColor: LAVENDER,
+        borderLeftColor,
         backdropFilter: "blur(10px)",
-        boxShadow: `0 8px 32px ${PURPLE}25`,
+        boxShadow,
       }}
     >
       <div className="flex-shrink-0 mt-0.5">{getIcon()}</div>
