@@ -14,9 +14,11 @@ const ProfilePostsSection = ({ user }) => {
   const { data: followingData, isLoading: followingLoading } = useFollowing(loggedInUser?._id);
 
   // Compute if logged-in user is following this profile user
-  const isFollowing = !followingLoading && followingData?.data?.some(
-    (follow) => follow.followee._id.toString() === user._id.toString()
-  );
+  const isFollowing = !followingLoading && followingData?.data?.some((follow) => {
+  if (!follow.followee?._id || !user?._id) return false;
+  return follow.followee._id.toString() === user._id.toString();
+});
+
 
   // Determine if posts should be shown
   const shouldShowPosts = isOwnProfile || isFollowing;

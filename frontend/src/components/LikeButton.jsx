@@ -16,7 +16,8 @@ export default function LikeButton({ postId, postOwnerId }) {
   const unlikeMutation = useUnlikePost()
   const createNotificationMutation = useCreateNotification()
 
-  const hasLiked = likesData.some((like) => like.userId._id === userId)
+  // Safe check: use optional chaining (?.) to avoid crashes if userId is null
+  const hasLiked = likesData.some((like) => like.userId?._id === userId)
 
   const isLoading =
     likesLoading || likeMutation.isLoading || unlikeMutation.isLoading || createNotificationMutation.isLoading

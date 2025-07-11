@@ -3,10 +3,11 @@
 import { useState } from "react"
 import { useAllPosts } from "../hooks/Admin/getAllPosts"
 import LikeButton from "../components/LikeButton"
-import { FiLock, FiUsers, FiGlobe, FiHeart } from "react-icons/fi"
+import { FiLock, FiUsers, FiGlobe } from "react-icons/fi"
 import { getBackendImageUrl } from "../utils/getBackendImageUrl"
 import PostModal from "./ViewPostInFeed"
 import CommentCount from "./CommentButton"
+import SugesstionFriends from "./SugesstionFriends"
 
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
@@ -116,11 +117,6 @@ function PostCard({ post, openModal }) {
           <LikeButton postId={post._id} postOwnerId={post.userId?._id} />
           <CommentCount postId={post._id} openPostModal={() => openModal(post)} />
         </div>
-
-        {/* <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-          <FiHeart size={16} />
-          <span>Share</span>
-        </div> */}
       </div>
     </div>
   )
@@ -141,45 +137,10 @@ export default function FeedComponent() {
     setSelectedPost(null)
   }
 
-  if (isLoading) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="space-y-6">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 animate-pulse">
-              <div className="flex items-center mb-4 gap-4">
-                <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
-                <div className="flex-1">
-                  <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-2"></div>
-                  <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/4"></div>
-                </div>
-              </div>
-              <div className="space-y-2 mb-4">
-                <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-                <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4"></div>
-              </div>
-              <div className="h-48 bg-gray-300 dark:bg-gray-600 rounded-xl"></div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  if (isError) {
-    return (
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-8 text-center">
-          <div className="text-red-500 text-6xl mb-4">⚠️</div>
-          <h3 className="text-xl font-bold text-red-800 dark:text-red-200 mb-2">Failed to load posts</h3>
-          <p className="text-red-600 dark:text-red-300">Please check your connection and try again.</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
+  <div className="relative w-full px-4 py-8">
+    {/* Centered Feed */}
+    <div className="max-w-2xl mx-auto">
       <div className="mb-8 text-center">
         <h2 className="text-3xl font-bold mb-2" style={{ color: PURPLE }}>
           Latest Posts
@@ -187,17 +148,37 @@ export default function FeedComponent() {
         <p className="text-gray-600 dark:text-gray-300">Stay connected with your community</p>
       </div>
 
-      {data?.data?.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-12 text-center">
-          <div className="text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">No posts yet</h3>
-          <p className="text-gray-600 dark:text-gray-400">Be the first to share something with the community!</p>
+      {isLoading ? (
+        <div className="space-y-6">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 animate-pulse">
+              <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-1/3 mb-2"></div>
+              <div className="h-3 bg-gray-300 dark:bg-gray-600 rounded w-1/4 mb-4"></div>
+              <div className="h-48 bg-gray-300 dark:bg-gray-600 rounded-xl"></div>
+            </div>
+          ))}
+        </div>
+      ) : isError ? (
+        <div className="bg-red-100 dark:bg-red-800/30 text-red-600 dark:text-red-300 rounded-lg p-4 text-center">
+          Failed to load posts. Please try again later.
+        </div>
+      ) : data?.data?.length === 0 ? (
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow p-8 text-center">
+          <h3 className="text-xl font-semibold text-gray-800 dark:text-white">No posts yet</h3>
+          <p className="text-gray-500 dark:text-gray-400">Be the first to share something!</p>
         </div>
       ) : (
-        data?.data?.map((post) => <PostCard key={post._id} post={post} openModal={openModal} />)
+        data.data.map((post) => <PostCard key={post._id} post={post} openModal={openModal} />)
       )}
 
       {selectedPost && <PostModal isOpen={modalOpen} onClose={closeModal} post={selectedPost} />}
     </div>
-  )
+
+    {/* Right-Aligned Suggestion Box */}
+    <div className="hidden lg:block absolute top-20 right-10 w-[300px]">
+      <SugesstionFriends />
+    </div>
+  </div>
+)
+
 }

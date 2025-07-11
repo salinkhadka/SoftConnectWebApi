@@ -92,6 +92,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
           boxShadow: `0 8px 32px ${PURPLE}15`,
           border: `1px solid ${LAVENDER}30`,
         }}
+        className="bg-white dark:bg-gray-800"
       >
         <div
           className="px-6 py-4 border-b"
@@ -108,13 +109,13 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
         <div className="overflow-x-auto">
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: "#f8fafc" }}>
-                <TableCell sx={{ fontWeight: "bold", color: PURPLE }}>Image</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: PURPLE }}>Author</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: PURPLE }}>Content</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: PURPLE }}>Privacy</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: PURPLE }}>Created</TableCell>
-                <TableCell sx={{ fontWeight: "bold", color: PURPLE }} align="center">
+              <TableRow sx={{ backgroundColor: "#f8fafc" }} className="dark:bg-gray-700">
+                <TableCell sx={{ fontWeight: "bold", color: PURPLE }} className="dark:text-purple-300">Image</TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: PURPLE }} className="dark:text-purple-300">Author</TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: PURPLE }} className="dark:text-purple-300">Content</TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: PURPLE }} className="dark:text-purple-300">Privacy</TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: PURPLE }} className="dark:text-purple-300">Created</TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: PURPLE }} align="center" className="dark:text-purple-300">
                   Actions
                 </TableCell>
               </TableRow>
@@ -129,6 +130,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                         backgroundColor: `${LAVENDER}08`,
                       },
                     }}
+                    className="dark:hover:bg-gray-700"
                   >
                     <TableCell>
                       {post.imageUrl ? (
@@ -139,8 +141,8 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                           sx={{ width: 60, height: 60 }}
                         />
                       ) : (
-                        <div className="w-15 h-15 bg-gray-100 rounded-lg flex items-center justify-center">
-                          <FiImage size={24} className="text-gray-400" />
+                        <div className="w-15 h-15 bg-gray-100 rounded-lg flex items-center justify-center dark:bg-gray-700">
+                          <FiImage size={24} className="text-gray-400 dark:text-gray-400" />
                         </div>
                       )}
                     </TableCell>
@@ -154,17 +156,17 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                           }
                           sx={{ width: 32, height: 32 }}
                         />
-                        <span className="font-medium">{post.userId?.username || "N/A"}</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{post.userId?.username || "N/A"}</span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="max-w-xs">
-                        <p className="truncate text-sm">{post.content}</p>
+                        <p className="truncate text-sm text-gray-800 dark:text-gray-300">{post.content}</p>
                       </div>
                     </TableCell>
                     <TableCell>{getPrivacyChip(post.privacy)}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                      <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
                         <FiCalendar size={14} />
                         {new Date(post.createdAt).toLocaleDateString()}
                       </div>
@@ -185,6 +187,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                               backgroundColor: "#10b98115",
                             },
                           }}
+                          className="dark:text-green-400"
                         >
                           View
                         </Button>
@@ -202,6 +205,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                               backgroundColor: `${PURPLE}15`,
                             },
                           }}
+                          className="dark:text-white"
                         >
                           Edit
                         </Button>
@@ -219,6 +223,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                               backgroundColor: "#ef444415",
                             },
                           }}
+                          className="dark:text-red-500"
                         >
                           Delete
                         </Button>
@@ -230,8 +235,8 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                 <TableRow>
                   <TableCell colSpan={6} align="center" sx={{ py: 8 }}>
                     <div className="text-center">
-                      <FiImage size={48} className="mx-auto mb-4 text-gray-400" />
-                      <Typography variant="h6" color="text.secondary">
+                      <FiImage size={48} className="mx-auto mb-4 text-gray-400 dark:text-gray-500" />
+                      <Typography variant="h6" color="text.secondary" className="dark:text-gray-400">
                         No posts found
                       </Typography>
                     </div>
@@ -254,6 +259,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
             borderRadius: 3,
             boxShadow: `0 20px 60px ${PURPLE}20`,
           },
+          className: "bg-white dark:bg-gray-800",
         }}
       >
         <DialogTitle
@@ -265,7 +271,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
         >
           View Post
         </DialogTitle>
-        <DialogContent sx={{ p: 4 }}>
+        <DialogContent sx={{ p: 4 }} className="bg-white dark:bg-gray-800">
           {selectedPost && (
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -277,27 +283,27 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                   }
                 />
                 <div>
-                  <Typography variant="subtitle1" fontWeight="bold">
+                  <Typography variant="subtitle1" fontWeight="bold" className="text-gray-900 dark:text-gray-100">
                     {selectedPost.userId?.username}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography variant="caption" color="text.secondary" className="dark:text-gray-400">
                     {new Date(selectedPost.createdAt).toLocaleString()}
                   </Typography>
                 </div>
               </div>
-              <Typography variant="body1">{selectedPost.content}</Typography>
+              <Typography variant="body1" className="text-gray-800 dark:text-gray-300">{selectedPost.content}</Typography>
               {selectedPost.imageUrl && (
                 <img
                   src={getBackendImageUrl(selectedPost.imageUrl) || "/placeholder.svg"}
                   alt="post"
-                  className="w-full rounded-lg max-h-96 object-contain bg-gray-100"
+                  className="w-full rounded-lg max-h-96 object-contain bg-gray-100 dark:bg-gray-700"
                 />
               )}
             </div>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={() => setOpenView(false)} variant="outlined">
+        <DialogActions sx={{ p: 3 }} className="bg-white dark:bg-gray-800">
+          <Button onClick={() => setOpenView(false)} variant="outlined" className="dark:text-white">
             Close
           </Button>
         </DialogActions>
@@ -306,7 +312,10 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
       {/* Edit Modal */}
       <Dialog
         open={openEdit}
-        onClose={() => setOpenEdit(false)}
+        onClose={() => {
+          setOpenEdit(false)
+          setEditImage(null)
+        }}
         maxWidth="sm"
         fullWidth
         PaperProps={{
@@ -314,6 +323,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
             borderRadius: 3,
             boxShadow: `0 20px 60px ${PURPLE}20`,
           },
+          className: "bg-white dark:bg-gray-800",
         }}
       >
         <DialogTitle
@@ -325,7 +335,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
         >
           Edit Post
         </DialogTitle>
-        <DialogContent sx={{ p: 4 }}>
+        <DialogContent sx={{ p: 4 }} className="bg-white dark:bg-gray-800">
           {selectedPost && (
             <Formik
               initialValues={{
@@ -356,7 +366,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                             : `https://ui-avatars.com/api/?name=${selectedPost.userId?.username || "U"}`
                         }
                       />
-                      <Typography variant="subtitle1" fontWeight="bold">
+                      <Typography variant="subtitle1" fontWeight="bold" className="text-gray-900 dark:text-gray-100">
                         {selectedPost.userId?.username}
                       </Typography>
                     </div>
@@ -375,6 +385,8 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                       helperText={touched.content && errors.content}
                       sx={{
                         "& .MuiOutlinedInput-root": {
+                          backgroundColor: "white",
+                          color: "black",
                           "&:hover fieldset": {
                             borderColor: LAVENDER,
                           },
@@ -382,7 +394,20 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                             borderColor: PURPLE,
                           },
                         },
+                        ".MuiInputLabel-root": {
+                          color: "black",
+                          "&.Mui-focused": {
+                            color: PURPLE,
+                          },
+                        },
+                        ".MuiFormHelperText-root": {
+                          color: "red",
+                        },
+                        ".MuiOutlinedInput-root.Mui-focused": {
+                          backgroundColor: "white",
+                        },
                       }}
+                      className="[&_.MuiOutlinedInput-root]:bg-white dark:[&_.MuiOutlinedInput-root]:bg-gray-700 [&_.MuiOutlinedInput-root]:text-gray-900 dark:[&_.MuiOutlinedInput-root]:text-gray-100 [&_.MuiInputLabel-root]:text-gray-700 dark:[&_.MuiInputLabel-root]:text-gray-300 [&_input]:text-gray-900 dark:[&_input]:text-gray-100"
                     />
 
                     {(editImage || selectedPost.imageUrl) && (
@@ -390,7 +415,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                         <img
                           src={editImage ? URL.createObjectURL(editImage) : getBackendImageUrl(selectedPost.imageUrl)}
                           alt="post"
-                          className="w-full rounded-lg max-h-64 object-contain bg-gray-100"
+                          className="w-full rounded-lg max-h-64 object-contain bg-gray-100 dark:bg-gray-700"
                         />
                       </div>
                     )}
@@ -406,6 +431,7 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                           backgroundColor: `${LAVENDER}15`,
                         },
                       }}
+                      className="dark:text-purple-300"
                     >
                       Change Image
                       <input
@@ -421,13 +447,14 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                     </Button>
                   </div>
 
-                  <DialogActions sx={{ px: 0, pt: 3 }}>
+                  <DialogActions sx={{ px: 0, pt: 3 }} className="bg-white dark:bg-gray-800">
                     <Button
                       onClick={() => {
                         setOpenEdit(false)
                         setEditImage(null)
                       }}
                       variant="outlined"
+                      className="dark:text-gray-300 dark:border-gray-400 dark:hover:bg-gray-700"
                     >
                       Cancel
                     </Button>
@@ -439,6 +466,9 @@ const PostTable = ({ posts, onDelete, onUpdate }) => {
                         background: `linear-gradient(135deg, ${PURPLE} 0%, ${LAVENDER} 100%)`,
                         "&:hover": {
                           background: `linear-gradient(135deg, ${LAVENDER} 0%, ${PURPLE} 100%)`,
+                        },
+                        "&:disabled": {
+                          background: "#9ca3af",
                         },
                       }}
                     >

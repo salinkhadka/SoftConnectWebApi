@@ -44,7 +44,7 @@ const AddPostComponent = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 dark:bg-gray-900 dark:text-gray-300 rounded-lg">
       <Formik
         initialValues={{ content: "", privacy: "friends" }}
         validationSchema={AddPostSchema}
@@ -83,6 +83,7 @@ const AddPostComponent = () => {
                     height: 64,
                     border: `3px solid ${LAVENDER}`,
                     boxShadow: `0 4px 15px ${PURPLE}20`,
+                    bgcolor: (theme) => theme.palette.mode === "dark" ? "#2a2a2a" : undefined,
                   }}
                 />
                 <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-400 rounded-full border-2 border-white"></div>
@@ -95,10 +96,15 @@ const AddPostComponent = () => {
                     color: PURPLE,
                     fontSize: "1.25rem",
                   }}
+                  className="dark:text-purple-300"
                 >
                   {user?.username || "User"}
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  className="dark:text-gray-400"
+                >
                   What's on your mind?
                 </Typography>
               </div>
@@ -123,6 +129,8 @@ const AddPostComponent = () => {
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 3,
                   fontSize: "1.1rem",
+                  bgcolor: (theme) => (theme.palette.mode === "dark" ? "#1e293b" : "inherit"),
+                  color: (theme) => (theme.palette.mode === "dark" ? "#e0e0e0" : "inherit"),
                   "&:hover fieldset": {
                     borderColor: LAVENDER,
                   },
@@ -134,12 +142,15 @@ const AddPostComponent = () => {
                 "& .MuiInputLabel-root.Mui-focused": {
                   color: PURPLE,
                 },
+                "& .MuiFormHelperText-root": {
+                  color: (theme) => (theme.palette.mode === "dark" ? "#f87171" : undefined),
+                },
               }}
             />
 
             {/* Privacy Selection */}
             <div className="mb-4">
-              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: "600", color: PURPLE }}>
+              <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: "600", color: PURPLE }} className="dark:text-purple-300">
                 Who can see this post?
               </Typography>
               <div className="flex gap-2 flex-wrap">
@@ -155,9 +166,13 @@ const AddPostComponent = () => {
                       color: values.privacy === option.value ? WHITE : option.color,
                       backgroundColor: values.privacy === option.value ? option.color : "transparent",
                       fontWeight: "600",
+                      cursor: "pointer",
                       "&:hover": {
                         backgroundColor: values.privacy === option.value ? option.color : `${option.color}15`,
                       },
+                      ...(values.privacy === option.value && {
+                        boxShadow: `0 0 8px ${option.color}AA`,
+                      }),
                     }}
                   />
                 ))}
@@ -166,29 +181,28 @@ const AddPostComponent = () => {
 
             {/* Image Preview */}
             {previewUrl && (
-              <div className="mb-4 relative">
-                <div className="relative rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
-                  <img
-                    src={previewUrl || "/placeholder.svg"}
-                    alt="Preview"
-                    className="w-full max-h-80 object-contain"
-                  />
-                  <IconButton
-                    onClick={handleRemoveImage}
-                    sx={{
-                      position: "absolute",
-                      top: 8,
-                      right: 8,
-                      backgroundColor: "rgba(0,0,0,0.7)",
-                      color: WHITE,
-                      "&:hover": {
-                        backgroundColor: "rgba(0,0,0,0.8)",
-                      },
-                    }}
-                  >
-                    <FiX size={20} />
-                  </IconButton>
-                </div>
+              <div className="mb-4 relative rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <img
+                  src={previewUrl || "/placeholder.svg"}
+                  alt="Preview"
+                  className="w-full max-h-80 object-contain"
+                />
+                <IconButton
+                  onClick={handleRemoveImage}
+                  sx={{
+                    position: "absolute",
+                    top: 8,
+                    right: 8,
+                    backgroundColor: "rgba(0,0,0,0.7)",
+                    color: WHITE,
+                    "&:hover": {
+                      backgroundColor: "rgba(0,0,0,0.8)",
+                    },
+                  }}
+                  aria-label="Remove image"
+                >
+                  <FiX size={20} />
+                </IconButton>
               </div>
             )}
 

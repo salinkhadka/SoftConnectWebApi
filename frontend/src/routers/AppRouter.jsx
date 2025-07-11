@@ -31,6 +31,7 @@ import NotificationPage from '../components/NotificationPage';
 import ForgotPassword from '../components/ForgotPassword';
 import ResetPassword from '../components/ResetPassword';
 import ChangePassword from '../components/ChangePassword';
+import AnalyticsPage from '../components/AnalyticsPage';
 
 export default function AppRouter() {
   return (
@@ -64,6 +65,7 @@ export default function AppRouter() {
               <Route path="/inbox" element={<InboxPage />} />
               <Route path="/notifications" element={<NotificationPage />} />
               <Route path="/:userid" element={<UserProfile />} />
+              <Route path="/sugesstion" element={<UserProfile />} />
               <Route path="/:userid/message" element={<MessagePage />} />
               <Route path="/changepassword" element={<ChangePassword />} />
             </Route>
@@ -77,6 +79,8 @@ export default function AppRouter() {
             <Route path="users" element={<UserPageAdmin />} />
             <Route path="posts" element={<PostPageAdmin />} />
             <Route path="addPost" element={<AddPostComponent />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+
             <Route path="*" element={<div>Admin Page Not Found</div>} />
           </Route>
         </Route>

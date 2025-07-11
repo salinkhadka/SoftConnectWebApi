@@ -371,7 +371,7 @@ export default function HomePage() {
 
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-medium transition-colors"
+                    className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-medium"
                   >
                     <FiLogOut size={20} />
                     <span>Logout</span>
@@ -394,9 +394,7 @@ export default function HomePage() {
 
       {/* Desktop Search Panel - Positioned beside sidebar */}
       {openSearchPanel && (
-        <div className="hidden lg:block">
-          <SearchPanel open={openSearchPanel} onClose={() => setOpenSearchPanel(false)} positioning="beside-sidebar" />
-        </div>
+        <SearchPanel open={openSearchPanel} onClose={() => setOpenSearchPanel(false)} positioning="beside-sidebar" />
       )}
 
       {/* Mobile Search Panel - Full screen modal */}

@@ -100,7 +100,7 @@ export const useUpdateUser = () => {
   });
 };
 
-// Delete user (admin only)
+
 export const useDeleteUser = () => {
   const queryClient = useQueryClient();
 
