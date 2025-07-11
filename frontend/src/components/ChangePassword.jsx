@@ -3,7 +3,7 @@
 import { useState, useContext } from "react"
 import axios from "axios"
 import { AuthContext } from "../auth/AuthProvider"
-import { toast } from "react-toastify"
+import { useToast } from "../contexts/ToastContext"
 import { Paper, TextField, Button, Typography, Stepper, Step, StepLabel } from "@mui/material"
 import { FiLock, FiShield, FiCheck } from "react-icons/fi"
 
@@ -13,6 +13,7 @@ const WHITE = "#FFFFFF"
 
 const ChangePassword = () => {
   const { user } = useContext(AuthContext)
+  const toast = useToast()
   const [currentPassword, setCurrentPassword] = useState("")
   const [verified, setVerified] = useState(false)
   const [token, setToken] = useState(null)

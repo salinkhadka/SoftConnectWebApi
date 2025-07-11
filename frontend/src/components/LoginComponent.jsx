@@ -5,7 +5,7 @@ import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useLogin } from "../hooks/useLogin"
 import { AuthContext } from "../auth/AuthProvider"
-import { toast } from "react-toastify"
+import { useToast } from "../contexts/ToastContext"
 import { Link } from "react-router-dom"
 import logo from "../assets/logo.png"
 import { useNavigate } from "react-router-dom"
@@ -18,6 +18,7 @@ export default function LoginForm() {
   const { mutate, isPending, isSuccess, data } = useLogin()
   const { user } = useContext(AuthContext)
   const navigate = useNavigate()
+  const toast = useToast()
 
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email address").required("Email is required"),
@@ -29,7 +30,7 @@ export default function LoginForm() {
     validationSchema,
     onSubmit: (values) => {
       mutate(values, {
-        onSuccess: () => toast.success("Login successful!"),
+        onSuccess: () => toast.success("Welcome back!"),
         onError: (error) => toast.error(error?.message || "Login failed!"),
       })
     },
@@ -137,7 +138,7 @@ export default function LoginForm() {
 
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <input
+                  {/* <input
                     id="remember-me"
                     name="remember-me"
                     type="checkbox"
@@ -146,7 +147,7 @@ export default function LoginForm() {
                   />
                   <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
                     Remember me
-                  </label>
+                  </label> */}
                 </div>
                 <Link
                   to="/forgot-password"

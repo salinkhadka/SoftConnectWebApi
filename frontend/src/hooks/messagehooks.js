@@ -1,88 +1,74 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
+"use client"
+
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useToast } from "../contexts/ToastContext"
 import {
   sendMessageService,
   getMessagesService,
   markMessagesAsReadService,
   getConversationsService,
-  deleteMessageService
-} from "../services/messageService";
+  deleteMessageService,
+} from "../services/messageService"
 
-// ✅ Fetch conversation messages between two users
 export const useMessages = (user1Id, user2Id) =>
   useQuery({
     queryKey: ["messages", user1Id, user2Id],
     queryFn: () => getMessagesService(user1Id, user2Id),
     enabled: !!user1Id && !!user2Id,
-    onError: (err) => {
-      toast.error(err?.message || "Failed to load messages");
-    },
-  });
+  })
 
-// ✅ Send a message
 export const useSendMessage = (user1Id, user2Id) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
+  const toast = useToast()
 
   return useMutation({
-    mutationFn: ({ recipientId, content }) =>
-      sendMessageService(recipientId, content),
+    mutationFn: ({ recipientId, content }) => sendMessageService(recipientId, content),
     mutationKey: ["send_message"],
     onSuccess: () => {
-      toast.success("Message sent");
-      queryClient.invalidateQueries(["messages", user1Id, user2Id]);
-      queryClient.invalidateQueries(["conversations", user1Id]);
+      toast.success("Message sent")
+      queryClient.invalidateQueries(["messages", user1Id, user2Id])
+      queryClient.invalidateQueries(["conversations", user1Id])
     },
     onError: (err) => {
-      toast.error(err?.message || "Failed to send message");
+      toast.error(err?.message || "Failed to send message")
     },
-  });
-};
+  })
+}
 
 export const useMarkAsRead = (user1Id, user2Id) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
 
   return useMutation({
-    // mutationFn now accepts an object { otherUserId }
     mutationFn: ({ otherUserId }) => markMessagesAsReadService(otherUserId),
     mutationKey: ["mark_as_read"],
     onSuccess: () => {
-      queryClient.invalidateQueries(["messages", user1Id, user2Id]);
-      queryClient.invalidateQueries(["conversations", user1Id]);
+      queryClient.invalidateQueries(["messages", user1Id, user2Id])
+      queryClient.invalidateQueries(["conversations", user1Id])
     },
-    onError: (err) => {
-      toast.error(err?.message || "Failed to mark as read");
-    },
-  });
-};
+  })
+}
 
-
-// ✅ Fetch users with whom the user has conversations
 export const useConversations = (userId) =>
   useQuery({
     queryKey: ["conversations", userId],
     queryFn: () => getConversationsService(userId),
     enabled: !!userId,
-    // refetchInterval: 10000, // Auto-refetch every 30 seconds
-    onError: (err) => {
-      toast.error(err?.message || "Failed to load conversations");
-    },
-  });
-  // ✅ Delete a message
+  })
+
 export const useDeleteMessage = (user1Id, user2Id) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
+  const toast = useToast()
 
   return useMutation({
     mutationFn: (messageId) => deleteMessageService(messageId),
     mutationKey: ["delete_message"],
     onSuccess: () => {
-      toast.success("Message deleted");
-      queryClient.invalidateQueries(["messages", user1Id, user2Id]);
-      queryClient.invalidateQueries(["conversations", user1Id]);
+      toast.success("Message deleted")
+      queryClient.invalidateQueries(["messages", user1Id, user2Id])
+      queryClient.invalidateQueries(["conversations", user1Id])
     },
     onError: (err) => {
-      toast.error(err?.message || "Failed to delete message");
+      toast.error(err?.message || "Failed to delete message")
     },
-  });
-};
-
-
+  })
+}

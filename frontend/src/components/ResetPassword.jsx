@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useResetPassword } from "../hooks/Admin/adminUserhook"
+import { useToast } from "../contexts/ToastContext"
 import { Paper, TextField, Button, Typography, Alert } from "@mui/material"
 import { FiLock, FiCheck } from "react-icons/fi"
 
@@ -26,6 +27,7 @@ export default function ResetPassword() {
   const { token } = useParams()
   const decodedToken = base64urlDecode(token)
   const navigate = useNavigate()
+  const toast = useToast()
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -35,12 +37,13 @@ export default function ResetPassword() {
 
   useEffect(() => {
     if (isSuccess) {
+      toast.success("Password reset successfully! Redirecting to login...")
       const timer = setTimeout(() => {
         navigate("/login")
       }, 3000)
       return () => clearTimeout(timer)
     }
-  }, [isSuccess, navigate])
+  }, [isSuccess, navigate, toast])
 
   if (!decodedToken) {
     return (

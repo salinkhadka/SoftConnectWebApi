@@ -1,56 +1,48 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
-import {
-  getPostCommentsService,
-  createCommentService,
-  deleteCommentService,
-} from "../services/commentService";
+"use client"
 
-// Fetch comments of a post
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useToast } from "../contexts/ToastContext"
+import { getPostCommentsService, createCommentService, deleteCommentService } from "../services/commentService"
+
 export const usePostComments = (postId) =>
   useQuery({
     queryKey: ["post_comments", postId],
     queryFn: () => getPostCommentsService(postId),
     enabled: !!postId,
-    onError: (err) => {
-      toast.error(err?.message || "Failed to load comments");
-    },
-  });
+  })
 
-// Add a new comment to a post
 export const useCreateComment = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
+  const toast = useToast()
 
   return useMutation({
     mutationFn: (commentData) => createCommentService(commentData),
     mutationKey: ["create_comment"],
     onSuccess: (_, variables) => {
-      toast.success("Comment added!");
-      // Invalidate query for comments of the specific post to refresh comment list
+      toast.success("Comment added!")
       if (variables?.postId) {
-        queryClient.invalidateQueries(["post_comments", variables.postId]);
+        queryClient.invalidateQueries(["post_comments", variables.postId])
       }
     },
     onError: (err) => {
-      toast.error(err?.message || "Failed to add comment");
+      toast.error(err?.message || "Failed to add comment")
     },
-  });
-};
+  })
+}
 
-// Delete a comment by ID
 export const useDeleteComment = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
+  const toast = useToast()
 
   return useMutation({
     mutationFn: (commentId) => deleteCommentService(commentId),
     mutationKey: ["delete_comment"],
     onSuccess: (_, commentId) => {
-      toast.success("Comment deleted!");
-      // Invalidate all post_comments queries to refresh comments (better to be more specific if possible)
-      queryClient.invalidateQueries({ queryKey: ["post_comments"] });
+      toast.success("Comment deleted!")
+      queryClient.invalidateQueries({ queryKey: ["post_comments"] })
     },
     onError: (err) => {
-      toast.error(err?.message || "Failed to delete comment");
+      toast.error(err?.message || "Failed to delete comment")
     },
-  });
-};
+  })
+}
