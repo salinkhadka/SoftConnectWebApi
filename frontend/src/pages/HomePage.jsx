@@ -115,7 +115,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-gray-50 dark:bg-[#121018] text-black dark:text-white font-sans overflow-hidden transition-colors duration-300">
+    <div className="flex flex-col lg:flex-row h-screen bg-gray-50 dark:bg-[#121018] text-black dark:text-white font-sans overflow-hidden transition-colors duration-300 relative">
       {/* Mobile Top Bar */}
       <header className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-[#1e1b29] border-b border-gray-200 dark:border-gray-700 z-40">
         {/* Left: Notifications */}
@@ -222,7 +222,7 @@ export default function HomePage() {
 
       {/* Desktop Sidebar */}
       <aside
-        className="hidden lg:flex w-80 flex-col justify-between p-6"
+        className="hidden lg:flex w-80 flex-col justify-between p-6 relative z-30"
         style={{
           background: `linear-gradient(180deg, ${PURPLE} 0%, #2d1b4e 100%)`,
           borderRight: `1px solid ${LAVENDER}40`,
@@ -392,6 +392,20 @@ export default function HomePage() {
         </div>
       </aside>
 
+      {/* Desktop Search Panel - Positioned beside sidebar */}
+      {openSearchPanel && (
+        <div className="hidden lg:block">
+          <SearchPanel open={openSearchPanel} onClose={() => setOpenSearchPanel(false)} positioning="beside-sidebar" />
+        </div>
+      )}
+
+      {/* Mobile Search Panel - Full screen modal */}
+      {openSearchPanel && (
+        <div className="lg:hidden">
+          <SearchPanel open={openSearchPanel} onClose={() => setOpenSearchPanel(false)} positioning="mobile-modal" />
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="flex-1 overflow-y-auto bg-gray-50 dark:bg-[#121018] transition-colors duration-300 pb-20 lg:pb-6">
         <div className="p-4 lg:p-6">
@@ -412,7 +426,6 @@ export default function HomePage() {
             <span className="text-xs mt-1 font-medium">Home</span>
           </NavLink>
 
-          {/* Changed from alerts to messages */}
           <NavLink to="/inbox" className={mobileLinkStyle}>
             <div className="relative">
               <FiMessageCircle size={24} />
@@ -440,9 +453,6 @@ export default function HomePage() {
 
       {/* Modals */}
       <AddPostModal open={openCreateModal} onClose={() => setOpenCreateModal(false)} />
-      <SearchPanel open={openSearchPanel} onClose={() => setOpenSearchPanel(false)} />
     </div>
   )
 }
-//apple
-//syau
