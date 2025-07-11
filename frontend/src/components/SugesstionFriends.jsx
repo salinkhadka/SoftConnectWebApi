@@ -19,9 +19,9 @@ export default function SugesstionFriends() {
 
   const navigate = useNavigate()
 
-  // Fetch all users
+
   const { data: allUsersData = [], isLoading: loadingUsers, error: errorUsers } = useGetUsersAdmin({ search: "" })
-  // Fetch users current user is following
+
   const {
     data: followingData = { data: [] },
     isLoading: loadingFollowing,
