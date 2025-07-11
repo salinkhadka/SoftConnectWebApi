@@ -37,7 +37,7 @@ export default function WriteComment({ postId, parentCommentId = null, onComment
         onSuccess: () => {
           setContent("")
           onCommentPosted?.()
-          toast.success("Comment posted")
+          // toast.success("Comment posted")
 
           if (postUserId && postUserId !== (user.id || user._id)) {
             createNotification({

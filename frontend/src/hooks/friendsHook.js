@@ -31,7 +31,7 @@ export const useFollowUser = (currentUserId) => {
     mutationFn: (followeeId) => followUserService(followeeId),
     mutationKey: ["follow_user"],
     onSuccess: (_, followeeId) => {
-      toast.success("User followed!")
+      // toast.success("User followed!")
       queryClient.invalidateQueries(["followers", followeeId])
       queryClient.invalidateQueries(["following", currentUserId])
     },
@@ -49,7 +49,7 @@ export const useUnfollowUser = (currentUserId) => {
     mutationFn: (followeeId) => unfollowUserService(followeeId),
     mutationKey: ["unfollow_user"],
     onSuccess: (_, followeeId) => {
-      toast.success("User unfollowed!")
+      // toast.success("User unfollowed!")
       queryClient.invalidateQueries(["followers", followeeId])
       queryClient.invalidateQueries(["following", currentUserId])
     },

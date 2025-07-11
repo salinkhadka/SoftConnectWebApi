@@ -25,7 +25,7 @@ export const useSendMessage = (user1Id, user2Id) => {
     mutationFn: ({ recipientId, content }) => sendMessageService(recipientId, content),
     mutationKey: ["send_message"],
     onSuccess: () => {
-      toast.success("Message sent")
+      // toast.success("Message sent")
       queryClient.invalidateQueries(["messages", user1Id, user2Id])
       queryClient.invalidateQueries(["conversations", user1Id])
     },
