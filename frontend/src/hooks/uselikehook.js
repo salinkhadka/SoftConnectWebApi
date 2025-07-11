@@ -26,7 +26,7 @@ export const useLikePost = () => {
     mutationFn: (postId) => likePostService(postId),
     mutationKey: ["like_post"],
     onSuccess: (_, postId) => {
-      toast.success("Post liked!");
+      // toast.success("Post liked!");
       queryClient.invalidateQueries(["post_likes", postId]);
     },
     onError: (err) => {
@@ -43,7 +43,7 @@ export const useUnlikePost = () => {
     mutationFn: (postId) => unlikePostService(postId),
     mutationKey: ["unlike_post"],
     onSuccess: (_, postId) => {
-      toast.success("Post unliked!");
+      // toast.success("Post unliked!");
       queryClient.invalidateQueries(["post_likes", postId]);
     },
     onError: (err) => {

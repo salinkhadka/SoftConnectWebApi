@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRequestPasswordReset } from "../hooks/Admin/adminUserhook"
+import { useToast } from "../contexts/ToastContext"
 import { Paper, TextField, Button, Typography, Alert } from "@mui/material"
 import { FiMail, FiArrowLeft } from "react-icons/fi"
 import { Link } from "react-router-dom"
@@ -14,6 +15,7 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
   const [error, setError] = useState("")
+  const toast = useToast()
 
   const { mutate: requestReset, isLoading } = useRequestPasswordReset()
 
@@ -25,9 +27,11 @@ export default function ForgotPassword() {
     requestReset(email, {
       onSuccess: (data) => {
         setMessage(data.message || "If the email exists, a reset link has been sent.")
+        toast.success("Password reset link sent to your email")
       },
       onError: (err) => {
         setError(err.message || "Error sending reset email.")
+        toast.error("Failed to send reset email")
       },
     })
   }
