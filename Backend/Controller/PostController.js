@@ -133,22 +133,22 @@ exports.deletePost = async (req, res) => {
 };
 
 
-// Get posts by a specific user
-exports.getUserPosts = async (req, res) => {
-  try {
-    const posts = await Post.find({ userId: req.params.userId })
-      .sort({ createdAt: -1 })
-      .populate('userId', 'username profilePhoto');
-    return res.status(200).json({
-      success: true,
-      message: "User's posts fetched successfully",
-      data: posts,
-    });
-  } catch (err) {
-    return res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-// Get posts by a specific user
+// // Get posts by a specific user
+// exports.getUserPosts = async (req, res) => {
+//   try {
+//     const posts = await Post.find({ userId: req.params.userId })
+//       .sort({ createdAt: -1 })
+//       .populate('userId', 'username profilePhoto');
+//     return res.status(200).json({
+//       success: true,
+//       message: "User's posts fetched successfully",
+//       data: posts,
+//     });
+//   } catch (err) {
+//     return res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+// // Get posts by a specific user
 exports.getUserPosts = async (req, res) => {
   const { userId } = req.params;
 
