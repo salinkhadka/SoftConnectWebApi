@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 
 // Create a new post
 exports.createPost = async (req, res) => {
-  const { userId, content, privacy } = req.body;
-  const imageUrl = req.file?.path || ''; // If you're using file uploads (e.g., multer)
+  const { userId, content, privacy,imageUrl } = req.body;
+  const imageUrlfinal = req.file?.path ||imageUrl|| ''; // If you're using file uploads (e.g., multer)
 
   if (!userId) {
     return res.status(400).json({ success: false, message: "Missing userId" });
@@ -19,7 +19,7 @@ exports.createPost = async (req, res) => {
     const newPost = new Post({
       userId:user._id,
       content,
-      imageUrl,
+      imageUrl: imageUrlfinal,
       privacy: privacy || 'public'
     });
 
@@ -69,14 +69,16 @@ exports.getOnePost = async (req, res) => {
 
 // Update a post
 exports.updatePost = async (req, res) => {
-  const { content, privacy } = req.body;
-  const imageUrl = req.file?.path;
+  const { content, privacy, imageUrl } = req.body;
+  const imageUrlFinal = req.file?.path || imageUrl || '';
 
   try {
+    // Prepare fields to update
     const updateFields = {};
+
     if (content !== undefined) updateFields.content = content;
     if (privacy !== undefined) updateFields.privacy = privacy;
-    if (imageUrl) updateFields.imageUrl = imageUrl;
+    updateFields.imageUrl = imageUrlFinal; // Always update imageUrl, even if it's an empty string
 
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
@@ -88,12 +90,17 @@ exports.updatePost = async (req, res) => {
       return res.status(404).json({ success: false, message: "Post not found" });
     }
 
-    return res.status(200).json({ success: true, message: "Post updated successfully", data: updatedPost });
+    return res.status(200).json({
+      success: true,
+      message: "Post updated successfully",
+      data: updatedPost
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // Delete a post
 exports.deletePost = async (req, res) => {
@@ -167,3 +174,19 @@ exports.getUserPosts = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+exports.uploadImage = (async (req, res, next) => {
+  // // check for the file size and send an error message
+  // if (req.file.size > process.env.MAX_FILE_UPLOAD) {
+  //   return res.status(400).send({
+  //     message: `Please upload an image less than ${process.env.MAX_FILE_UPLOAD}`,
+  //   });
+  // }
+
+  if (!req.file) {
+    return res.status(400).send({ message: "Please upload a file" });
+  }
+  res.status(200).json({
+    success: true,
+    data: `uploads/${req.file.filename}`,
+  });
+});

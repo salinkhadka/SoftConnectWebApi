@@ -82,16 +82,22 @@ exports.resetPassword = async (req, res) => {
 
 // Register
 exports.registerUser = async (req, res) => {
-  const { username, email, password, StudentId, role, bio } = req.body;
-  const fileName = req.file?.path;
+  const { username, email, password, StudentId, role, bio, profilePhoto } = req.body;
 
-  if (!email || !password ) {
+  // If file uploaded, use its filename, else fallback to profilePhoto string in body
+  const fileName = req.file?.filename || profilePhoto || '';
+
+  if (!email || !password) {
     return res.status(400).json({ success: false, message: "Missing fields" });
   }
 
+  // if (!email || !password ) {
+  //   return res.status(400).json({ success: false, message: "Missing fields" });
+  // }
+
   try {
     const existingUser = await User.findOne({
-      $or: [{ username }, { email },{StudentId}],
+      $or: [{ username }, { email }, { StudentId }],
     });
 
     if (existingUser) {
@@ -122,7 +128,7 @@ exports.registerUser = async (req, res) => {
 
 // Login
 exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, fcmToken } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ success: false, message: "Missing fields" });
@@ -135,12 +141,17 @@ exports.loginUser = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(403).json({ success: false, message: "Invalid credentials" });
 
+    // 🔥 Update FCM token if changed
+    if (fcmToken && fcmToken !== user.fcmToken) {
+      user.fcmToken = fcmToken;
+      await user.save();
+    }
+
     const payload = {
       _id: user._id,
       email: user.email,
       username: user.username,
       role: user.role,
-      
     };
 
     const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "7d" });
@@ -156,6 +167,7 @@ exports.loginUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 
@@ -217,8 +229,8 @@ exports.getOneUser = async (req, res) => {
 };
 
 exports.updateOneUser = async (req, res) => {
-  const { username, email, bio, role } = req.body;
-  const fileName = req.file?.path;
+  const { username, email, bio, role, profilePhoto } = req.body; // Added profilePhoto from body
+  const fileName = req.file?.filename || profilePhoto || null;  // Use uploaded file or profilePhoto URL or null
 
   try {
     const updateFields = {};
@@ -226,7 +238,7 @@ exports.updateOneUser = async (req, res) => {
     if (email !== undefined) updateFields.email = email;
     if (bio !== undefined) updateFields.bio = bio;
     if (role !== undefined) updateFields.role = role;
-    if (fileName) updateFields.profilePhoto = fileName;
+    if (fileName !== null) updateFields.profilePhoto = fileName;
 
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
@@ -248,6 +260,7 @@ exports.updateOneUser = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 
 // Delete one user

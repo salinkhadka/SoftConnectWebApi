@@ -1,5 +1,6 @@
-// NotificationController.js
 const Notification = require('../Model/NotificationModel');
+const User = require('../Model/UserModel'); // Import User to get FCM token
+const admin = require('../Config/firebase'); // Your initialized admin SDK
 
 exports.createNotification = async (req, res) => {
   const sender = req.user.id;
@@ -13,6 +14,7 @@ exports.createNotification = async (req, res) => {
   }
 
   try {
+    // Save notification in DB
     const notification = new Notification({
       recipient,
       sender,
@@ -20,8 +22,34 @@ exports.createNotification = async (req, res) => {
       message,
       relatedId,
     });
-
     await notification.save();
+
+    // Fetch recipient user to get their FCM token
+    const recipientUser = await User.findById(recipient);
+
+    if (recipientUser && recipientUser.fcmToken) {
+      // Prepare message payload
+      const payload = {
+        notification: {
+          title: "New Notification",
+          body: message,
+        },
+        data: {
+          type,
+          relatedId: relatedId ? relatedId.toString() : '',
+        },
+        token: recipientUser.fcmToken,
+      };
+
+      // Send push notification with Firebase Admin SDK
+      admin.messaging().send(payload)
+        .then(response => {
+          console.log("Successfully sent FCM notification:", response);
+        })
+        .catch(error => {
+          console.error("Error sending FCM notification:", error);
+        });
+    }
 
     res.status(201).json({
       success: true,
@@ -33,6 +61,81 @@ exports.createNotification = async (req, res) => {
     res.status(500).json({ success: false, message: 'Server error' });
   }
 };
+
+exports.getNotifications = async (req, res) => {
+  const { userId } = req.params;
+
+  // Authorization check
+  if (req.user.id !== userId) {
+    return res.status(403).json({
+      success: false,
+      message: "You're not authorized to view these notifications",
+    });
+  }
+
+  try {
+    const notifications = await Notification.find({ recipient: userId })
+      .sort({ createdAt: -1 })
+      .populate('sender', 'username profilePhoto');
+
+    res.json({ success: true, data: notifications });
+  } catch (err) {
+    console.error('Get Notifications Error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.markAsRead = async (req, res) => {
+  const { notificationId } = req.params;
+
+  try {
+    const notification = await Notification.findById(notificationId);
+
+    if (!notification) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+
+    if (notification.recipient.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not allowed to mark this notification' });
+    }
+
+    notification.isRead = true;
+    await notification.save();
+
+    res.json({
+      success: true,
+      message: 'Notification marked as read',
+      data: notification,
+    });
+  } catch (err) {
+    console.error('Mark As Read Error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.deleteNotification = async (req, res) => {
+  const { notificationId } = req.params;
+
+  try {
+    const notification = await Notification.findById(notificationId);
+
+    if (!notification) {
+      return res.status(404).json({ success: false, message: 'Notification not found' });
+    }
+
+    if (notification.recipient.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Not authorized to delete this notification' });
+    }
+
+    await notification.deleteOne();
+
+    res.json({ success: true, message: 'Notification deleted' });
+  } catch (err) {
+    console.error('Delete Notification Error:', err);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
 
 exports.getNotifications = async (req, res) => {
   const { userId } = req.params;

@@ -10,11 +10,12 @@ const storage = multer.diskStorage({
     }
 })
 const fileFilter = (req, file, cb) => {
+     console.log("File mimetype:", file.mimetype);
     if (file.mimetype.startsWith("image")) cb(null, true)
     else cb(new Error("only image is allowed"), false)
 }
 const upload = multer({
-    storage, limits: { fileSize: 100 * 1024 },
+    storage, limits: { fileSize: 10*1024 * 1024 },
     fileFilter
 })
 module.exports = {

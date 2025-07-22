@@ -4,12 +4,12 @@ const commentController = require("../Controller/CommentController");
 const { authenticateUser } = require("../Middleware/AuthMiddleware");
 
 // Protected route
-router.post("/createComment", authenticateUser, commentController.createComment);              // Add a comment
+router.post("/createComment", authenticateUser, commentController.createComment);              
 
 // Public route
-router.get("/comments/:postId", commentController.getPostComments);                   // Get comments on a post
+router.get("/comments/:postId", commentController.getPostComments);       
 
 // Protected route
-router.delete("/delete/:commentId", authenticateUser, commentController.deleteComment);  // Delete a comment
+router.delete("/delete/:commentId", authenticateUser, commentController.deleteComment);  
 
 module.exports = router;

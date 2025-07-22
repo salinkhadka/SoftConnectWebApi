@@ -12,17 +12,37 @@ exports.likePost = async (req, res) => {
       return res.status(400).json({ success: false, message: "Post already liked" });
     }
 
-    const newLike = new Like({ userId, postId });
+    let newLike = new Like({ userId, postId });
     await newLike.save();
 
-    return res.status(201).json({ success: true, message: "Post liked", data: newLike });
+    // Populate userId for Flutter notification to work
+    newLike = await newLike.populate("userId", "_id username profilePhoto");
+
+    // Populate post to get postOwnerId
+    const post = await Post.findById(postId).populate("userId", "_id");
+    if (!post) {
+      return res.status(404).json({ success: false, message: "Post not found" });
+    }
+
+    const postOwnerId = post.userId._id.toString();
+
+    return res.status(201).json({
+      success: true,
+      message: "Post liked",
+      data: {
+        ...newLike.toObject(),
+        postOwnerId: postOwnerId,
+      },
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
 
-// Unlike a post
+
+
+
 exports.unlikePost = async (req, res) => {
   const { userId, postId } = req.body;
 

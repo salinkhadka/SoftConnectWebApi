@@ -1,6 +1,8 @@
 const Comment = require("../Model/CommentModel");
 const Post = require("../Model/PostModel");
+const Notification = require("../Model/NotificationModel");
 const mongoose = require("mongoose");
+
 
 exports.createComment = async (req, res) => {
   const { userId, postId, content, parentCommentId } = req.body;
@@ -19,16 +21,43 @@ exports.createComment = async (req, res) => {
 
     await newComment.save();
 
+    // Populate user for Flutter like model
+    await newComment.populate("userId", "_id username profilePhoto");
+
+    // Fetch post to get post owner
+    const post = await Post.findById(postId).populate("userId", "_id");
+    if (!post) {
+      return res.status(404).json({ success: false, message: "Post not found" });
+    }
+
+    const postOwnerId = post.userId._id.toString();
+
+    // 🔔 Avoid self-comment notification
+    if (userId !== postOwnerId) {
+      const notification = new Notification({
+        recipient: postOwnerId,
+        type: "comment",
+        message: `${newComment.userId.username} commented on your post`,
+        relatedId: postId,
+      });
+
+      await notification.save();
+    }
+
     return res.status(201).json({
       success: true,
       message: "Comment added successfully",
-      data: newComment,
+      data: {
+        ...newComment.toObject(),
+        postOwnerId: postOwnerId,
+      },
     });
   } catch (err) {
     console.error("Create Comment Error:", err);
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
 
 // Get all comments for a post
 exports.getPostComments = async (req, res) => {

@@ -12,6 +12,7 @@ router.get("/:id", postController.getOnePost);              // Get single post
 // Protected routes (require login)
 router.post("/createPost", authenticateUser, fileUpload.single("imageUrl"), postController.createPost);     // Create post
 router.put("/:id", authenticateUser, fileUpload.single("imageUrl"), postController.updatePost);   // Update post
-router.delete("/:id", authenticateUser, postController.deletePost);                              // Delete post
+router.delete("/:id", authenticateUser, postController.deletePost);   
+router.post("/uploadImg",fileUpload.single("postImg"),postController.uploadImage);                           // Delete post
 
 module.exports = router;

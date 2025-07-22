@@ -32,7 +32,12 @@ const userSchema = new mongoose.Schema(
     },
     // isVerified: { type: Boolean, default: false }, // if you implement email verification
     followersCount: { type: Number, default: 0 },  // if you want faster follower count
-    followingCount: { type: Number, default: 0 },  // same for following
+    followingCount: { type: Number, default: 0 },
+    fcmToken: {
+  type: String,
+  default: '',
+},
+
 
   },
   {
