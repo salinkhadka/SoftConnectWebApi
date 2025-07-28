@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useState, useEffect, useRef } from "react"
+import { useParams } from "react-router-dom"
 import { useResetPassword } from "../hooks/Admin/adminUserhook"
 import { useToast } from "../contexts/ToastContext"
 import { Paper, TextField, Button, Typography, Alert } from "@mui/material"
@@ -26,29 +26,30 @@ const base64urlDecode = (str) => {
 export default function ResetPassword() {
   const { token } = useParams()
   const decodedToken = base64urlDecode(token)
-  const navigate = useNavigate()
   const toast = useToast()
 
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [localError, setLocalError] = useState(null)
+  const toastShown = useRef(false) // ✅ prevent multiple toasts
 
   const { mutate, isLoading, isError, error, isSuccess, data } = useResetPassword()
 
   useEffect(() => {
-    if (isSuccess) {
-      toast.success("Password reset successfully! Redirecting to login...")
-      const timer = setTimeout(() => {
-        navigate("/login")
-      }, 3000)
-      return () => clearTimeout(timer)
+    if (isSuccess && !toastShown.current) {
+      toastShown.current = true
+      toast.success("Password reset successfully!")
+      // Reset form after successful password reset
+      setPassword("")
+      setConfirmPassword("")
+      setLocalError(null)
     }
-  }, [isSuccess, navigate, toast])
+  }, [isSuccess, toast])
 
   if (!decodedToken) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
-        <Paper sx={{ p: 6, borderRadius: 3, textAlign: "center" }}>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <Paper sx={{ p: { xs: 4, sm: 6 }, borderRadius: 3, textAlign: "center", maxWidth: 400, width: "100%" }}>
           <Typography variant="h6" color="error">
             Invalid or malformed reset token.
           </Typography>
@@ -74,29 +75,42 @@ export default function ResetPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md">
         {/* Header */}
         <div
-          className="text-center mb-8 p-8 rounded-3xl"
+          className="text-center mb-6 sm:mb-8 p-6 sm:p-8 rounded-3xl"
           style={{
             background: `linear-gradient(135deg, ${PURPLE} 0%, ${LAVENDER} 100%)`,
           }}
         >
           <div className="flex items-center justify-center gap-3 mb-4">
-            <FiLock size={32} className="text-white" />
-            <Typography variant="h4" sx={{ color: WHITE, fontWeight: "bold" }}>
+            <FiLock size={28} className="text-white sm:text-[32px]" />
+            <Typography 
+              variant="h4" 
+              sx={{ 
+                color: WHITE, 
+                fontWeight: "bold",
+                fontSize: { xs: "1.5rem", sm: "2.125rem" }
+              }}
+            >
               Reset Password
             </Typography>
           </div>
-          <Typography variant="body1" sx={{ color: "rgba(255,255,255,0.9)" }}>
+          <Typography 
+            variant="body1" 
+            sx={{ 
+              color: "rgba(255,255,255,0.9)",
+              fontSize: { xs: "0.875rem", sm: "1rem" }
+            }}
+          >
             Create a new secure password for your account
           </Typography>
         </div>
 
         <Paper
           sx={{
-            p: 6,
+            p: { xs: 4, sm: 6 },
             borderRadius: 3,
             boxShadow: `0 8px 32px ${PURPLE}15`,
             border: `1px solid ${LAVENDER}30`,
@@ -106,10 +120,12 @@ export default function ResetPassword() {
           {isSuccess && data?.message && (
             <Alert severity="success" sx={{ mb: 3, borderRadius: 2 }} icon={<FiCheck />}>
               <div>
-                <Typography variant="body1" fontWeight="bold">
+                <Typography variant="body1" fontWeight="bold" sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}>
                   {data.message}
                 </Typography>
-                <Typography variant="body2">Redirecting to login page in 3 seconds...</Typography>
+                <Typography variant="body2" sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}>
+                  Your password has been successfully updated!
+                </Typography>
               </div>
             </Alert>
           )}
@@ -117,22 +133,36 @@ export default function ResetPassword() {
           {/* Error Messages */}
           {(localError || isError) && (
             <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
-              {localError || error?.message || "Failed to reset password. Try again."}
+              <Typography sx={{ fontSize: { xs: "0.875rem", sm: "1rem" } }}>
+                {localError || error?.message || "Failed to reset password. Try again."}
+              </Typography>
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="text-center mb-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div className="text-center mb-4 sm:mb-6">
               <div
-                className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-full mx-auto mb-3 sm:mb-4 flex items-center justify-center"
                 style={{ backgroundColor: `${PURPLE}15` }}
               >
-                <FiLock size={24} style={{ color: PURPLE }} />
+                <FiLock size={20} className="sm:text-[24px]" style={{ color: PURPLE }} />
               </div>
-              <Typography variant="h6" sx={{ color: PURPLE, fontWeight: "bold", mb: 1 }}>
+              <Typography 
+                variant="h6" 
+                sx={{ 
+                  color: PURPLE, 
+                  fontWeight: "bold", 
+                  mb: 1,
+                  fontSize: { xs: "1.125rem", sm: "1.25rem" }
+                }}
+              >
                 Create New Password
               </Typography>
-              <Typography variant="body2" color="text.secondary">
+              <Typography 
+                variant="body2" 
+                color="text.secondary"
+                sx={{ fontSize: { xs: "0.75rem", sm: "0.875rem" } }}
+              >
                 Choose a strong password to secure your account
               </Typography>
             </div>
@@ -149,6 +179,7 @@ export default function ResetPassword() {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
                   "&:hover fieldset": {
                     borderColor: LAVENDER,
                   },
@@ -156,8 +187,14 @@ export default function ResetPassword() {
                     borderColor: PURPLE,
                   },
                 },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: PURPLE,
+                "& .MuiInputLabel-root": {
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                  "&.Mui-focused": {
+                    color: PURPLE,
+                  },
+                },
+                "& .MuiFormHelperText-root": {
+                  fontSize: { xs: "0.75rem", sm: "0.75rem" },
                 },
               }}
             />
@@ -175,6 +212,7 @@ export default function ResetPassword() {
               sx={{
                 "& .MuiOutlinedInput-root": {
                   borderRadius: 2,
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
                   "&:hover fieldset": {
                     borderColor: LAVENDER,
                   },
@@ -182,8 +220,14 @@ export default function ResetPassword() {
                     borderColor: PURPLE,
                   },
                 },
-                "& .MuiInputLabel-root.Mui-focused": {
-                  color: PURPLE,
+                "& .MuiInputLabel-root": {
+                  fontSize: { xs: "0.875rem", sm: "1rem" },
+                  "&.Mui-focused": {
+                    color: PURPLE,
+                  },
+                },
+                "& .MuiFormHelperText-root": {
+                  fontSize: { xs: "0.75rem", sm: "0.75rem" },
                 },
               }}
             />
@@ -194,11 +238,11 @@ export default function ResetPassword() {
               fullWidth
               size="large"
               sx={{
-                py: 1.5,
+                py: { xs: 1.2, sm: 1.5 },
                 borderRadius: 2,
                 textTransform: "none",
                 fontWeight: "600",
-                fontSize: "1.1rem",
+                fontSize: { xs: "1rem", sm: "1.1rem" },
                 background: `linear-gradient(135deg, ${PURPLE} 0%, ${LAVENDER} 100%)`,
                 color: WHITE,
                 boxShadow: `0 4px 15px ${PURPLE}40`,
