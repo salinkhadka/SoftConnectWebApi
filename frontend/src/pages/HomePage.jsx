@@ -1,5 +1,4 @@
 "use client"
-
 import { useEffect, useState, useRef, useContext } from "react"
 import { NavLink, Outlet, useNavigate } from "react-router-dom"
 import {
@@ -22,6 +21,7 @@ import logo from "../assets/logo.png"
 import { AuthContext } from "../auth/AuthProvider"
 import AddPostModal from "../components/AddPostModal"
 import SearchPanel from "../components/SearchModal"
+import ConfirmationModal from "../components/ui/ConfirmationModal"
 
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
@@ -34,6 +34,7 @@ export default function HomePage() {
   const [openSearchPanel, setOpenSearchPanel] = useState(false)
   const [showMore, setShowMore] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [theme, setTheme] = useState(() => {
     const saved = localStorage.getItem("theme")
     if (saved) return saved
@@ -86,7 +87,13 @@ export default function HomePage() {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"))
   }
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true)
+    setShowMore(false)
+    setShowMobileMenu(false)
+  }
+
+  const handleLogoutConfirm = () => {
     logout()
     navigate("/login")
   }
@@ -126,7 +133,6 @@ export default function HomePage() {
           <FiBell size={24} style={{ color: PURPLE }} />
           <Badge count={unreadNotifications} />
         </button>
-
         {/* Center: Search */}
         <button
           onClick={() => setOpenSearchPanel(true)}
@@ -135,7 +141,6 @@ export default function HomePage() {
           <FiSearch size={20} />
           <span>Search users...</span>
         </button>
-
         {/* Right: More Menu */}
         <div className="relative" ref={mobileMenuRef}>
           <button
@@ -148,7 +153,6 @@ export default function HomePage() {
               <FiMenu size={24} style={{ color: PURPLE }} />
             )}
           </button>
-
           {/* Mobile Menu Dropdown */}
           {showMobileMenu && (
             <div className="absolute right-0 top-12 w-64 bg-white dark:bg-[#1e1b29] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 p-4">
@@ -168,7 +172,6 @@ export default function HomePage() {
                   <p className="text-sm text-gray-500 dark:text-gray-400">{user?.email}</p>
                 </div>
               </div>
-
               {/* Messages */}
               <button
                 onClick={() => {
@@ -181,7 +184,6 @@ export default function HomePage() {
                 <span>Messages</span>
                 <Badge count={unreadMessages} className="relative top-0 right-0 ml-auto" />
               </button>
-
               {/* Theme Toggle */}
               <div className="flex items-center justify-between px-3 py-2 mt-2">
                 <span className="text-gray-700 dark:text-gray-300 font-medium flex items-center gap-3">
@@ -201,15 +203,10 @@ export default function HomePage() {
                   ></div>
                 </button>
               </div>
-
               <div className="border-t border-gray-200 dark:border-gray-600 my-3"></div>
-
               {/* Logout */}
               <button
-                onClick={() => {
-                  handleLogout()
-                  setShowMobileMenu(false)
-                }}
+                onClick={handleLogoutClick}
                 className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-medium"
               >
                 <FiLogOut size={20} />
@@ -248,7 +245,6 @@ export default function HomePage() {
               <p className="text-white/70 text-sm mt-1">Connect • Share • Grow</p>
             </div>
           </div>
-
           {/* Navigation */}
           <nav className="flex flex-col space-y-2">
             <button
@@ -261,7 +257,6 @@ export default function HomePage() {
               <FiSearch size={24} />
               <span>Search</span>
             </button>
-
             <NavLink
               to="/feed"
               className={linkStyle}
@@ -274,7 +269,6 @@ export default function HomePage() {
               <FiHome size={24} />
               <span>Home</span>
             </NavLink>
-
             <NavLink
               to="/inbox"
               className={linkStyle}
@@ -290,7 +284,6 @@ export default function HomePage() {
               </div>
               <span>Messages</span>
             </NavLink>
-
             <NavLink
               to="/notifications"
               className={linkStyle}
@@ -306,7 +299,6 @@ export default function HomePage() {
               </div>
               <span>Notifications</span>
             </NavLink>
-
             <button
               className={linkStyle({ isActive: false })}
               onClick={() => setOpenCreateModal(true)}
@@ -317,7 +309,6 @@ export default function HomePage() {
               <FiPlusCircle size={24} />
               <span>Create</span>
             </button>
-
             <NavLink
               to="/profile"
               className={linkStyle}
@@ -330,7 +321,6 @@ export default function HomePage() {
               <FiUser size={24} />
               <span>Profile</span>
             </NavLink>
-
             {/* More Button */}
             <div className="relative" ref={moreRef}>
               <button
@@ -344,7 +334,6 @@ export default function HomePage() {
                 <FiMoreHorizontal size={24} />
                 <span>More</span>
               </button>
-
               {showMore && (
                 <div className="absolute w-72 left-0 bottom-16 bg-white dark:bg-[#1e1b29] rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-50 p-4">
                   {/* Theme Toggle */}
@@ -366,11 +355,9 @@ export default function HomePage() {
                       ></div>
                     </button>
                   </div>
-
                   <div className="border-t border-gray-200 dark:border-gray-600 my-3"></div>
-
                   <button
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     className="flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 font-medium"
                   >
                     <FiLogOut size={20} />
@@ -381,7 +368,6 @@ export default function HomePage() {
             </div>
           </nav>
         </div>
-
         {/* Footer */}
         <div className="text-center mt-8">
           <div className="text-sm font-semibold">
@@ -423,7 +409,6 @@ export default function HomePage() {
             <FiHome size={24} />
             <span className="text-xs mt-1 font-medium">Home</span>
           </NavLink>
-
           <NavLink to="/inbox" className={mobileLinkStyle}>
             <div className="relative">
               <FiMessageCircle size={24} />
@@ -431,7 +416,6 @@ export default function HomePage() {
             </div>
             <span className="text-xs mt-1 font-medium">Messages</span>
           </NavLink>
-
           <button
             onClick={() => setOpenCreateModal(true)}
             className="flex flex-col items-center justify-center p-3 rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
@@ -441,7 +425,6 @@ export default function HomePage() {
           >
             <FiPlusCircle size={28} className="text-white" />
           </button>
-
           <NavLink to="/profile" className={mobileLinkStyle}>
             <FiUser size={24} />
             <span className="text-xs mt-1 font-medium">Profile</span>
@@ -451,6 +434,18 @@ export default function HomePage() {
 
       {/* Modals */}
       <AddPostModal open={openCreateModal} onClose={() => setOpenCreateModal(false)} />
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmationModal
+        open={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Confirm Logout"
+        message="Are you sure you want to logout? You'll need to sign in again to access your account."
+        confirmText="Logout"
+        cancelText="Cancel"
+        type="warning"
+      />
     </div>
   )
 }

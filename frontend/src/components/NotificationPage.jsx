@@ -6,7 +6,7 @@ import { AuthContext } from "../auth/AuthProvider"
 import { formatDistanceToNow } from "date-fns"
 import { FiBell, FiTrash2, FiRefreshCcw, FiThumbsUp, FiMessageCircle, FiUserPlus, FiCheckCircle } from "react-icons/fi"
 import DeleteModal from "./DeleteModal"
-import { toast } from "react-toastify"
+import { useToast } from "../contexts/ToastContext"
 
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
@@ -17,6 +17,7 @@ export default function NotificationPage() {
   const [notifications, setNotifications] = useState([])
   const [loading, setLoading] = useState(true)
   const [deleteTargetId, setDeleteTargetId] = useState(null)
+  const toast=useToast();
 
   const fetchNotifications = async () => {
     try {

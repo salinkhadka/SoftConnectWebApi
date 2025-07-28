@@ -8,7 +8,7 @@ import ChatInput from "./ChatInput.jsx"
 import { AuthContext } from "../auth/AuthProvider.jsx"
 import { FiArrowLeft, FiSettings } from "react-icons/fi"
 import { getBackendImageUrl } from "../utils/getBackendImageUrl.js"
-import { useUser } from "../hooks/Admin/adminUserhook.js" // <-- make sure this hook is correct
+import { useUser } from "../hooks/Admin/adminUserhook.js"
 
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
@@ -38,7 +38,10 @@ export default function MessagePage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: PURPLE }}></div>
+          <div
+            className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4"
+            style={{ borderColor: PURPLE }}
+          ></div>
           <p className="text-gray-600">Loading user info...</p>
         </div>
       </div>
@@ -85,8 +88,11 @@ export default function MessagePage() {
               <FiArrowLeft size={20} className="text-white" />
             </button>
 
-            {/* Recipient Info */}
-            <div className="flex items-center gap-3">
+            {/* Recipient Info (Clickable) */}
+            <div
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => navigate(`/${recipientId}`)}
+            >
               <div className="relative">
                 <img
                   src={

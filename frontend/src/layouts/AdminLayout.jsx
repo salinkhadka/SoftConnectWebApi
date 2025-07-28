@@ -3,6 +3,7 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom"
 import { useContext, useState, useRef, useEffect } from "react"
 import { AuthContext } from "../auth/AuthProvider"
+import ConfirmationModal from "../components/ui/ConfirmationModal"
 import {
   FiUsers,
   FiFileText,
@@ -31,10 +32,10 @@ export default function AdminLayout() {
     }
     return false
   })
-
   const navigate = useNavigate()
   const [showMoreMenu, setShowMoreMenu] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const moreMenuRef = useRef(null)
 
   useEffect(() => {
@@ -59,9 +60,13 @@ export default function AdminLayout() {
 
   const toggleDarkMode = () => setIsDarkMode((prev) => !prev)
 
-  const handleLogout = () => {
-    logout()
+  const handleLogoutClick = () => {
+    setShowLogoutConfirm(true)
     setShowMoreMenu(false)
+  }
+
+  const handleLogoutConfirm = () => {
+    logout()
   }
 
   const handleChangePassword = () => {
@@ -97,7 +102,6 @@ export default function AdminLayout() {
             <h2 className="text-2xl font-bold text-white">SoftConnect</h2>
             <p className="text-sm text-white/70 mt-1">Admin Panel</p>
           </div>
-
           <nav className="flex-1 p-6 space-y-2">
             {navItems.map((item) => (
               <NavLink key={item.to} to={item.to} className={linkStyle}>
@@ -105,7 +109,6 @@ export default function AdminLayout() {
                 {item.label}
               </NavLink>
             ))}
-
             {/* More menu - Desktop */}
             <div className="relative">
               <button
@@ -117,7 +120,6 @@ export default function AdminLayout() {
                 <FiMoreHorizontal size={20} />
                 More
               </button>
-
               {showMoreMenu && (
                 <div
                   ref={moreMenuRef}
@@ -143,7 +145,6 @@ export default function AdminLayout() {
                       </p>
                     </div>
                   </div>
-
                   {/* Dark Mode toggle */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 text-sm font-medium text-gray-800 dark:text-white">
@@ -163,9 +164,7 @@ export default function AdminLayout() {
                       />
                     </button>
                   </div>
-
                   <div className="border-t border-gray-200 dark:border-gray-600 my-3" />
-
                   {/* Change Password */}
                   <button
                     onClick={handleChangePassword}
@@ -174,10 +173,9 @@ export default function AdminLayout() {
                     <FiKey size={18} />
                     Change Password
                   </button>
-
                   {/* Logout */}
                   <button
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     className="mt-1 flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium"
                   >
                     <FiLogOut size={18} />
@@ -187,7 +185,6 @@ export default function AdminLayout() {
               )}
             </div>
           </nav>
-
           <div className="p-6 border-t border-white/20 text-center text-xs text-white/60">© 2025 SoftConnect</div>
         </div>
       </aside>
@@ -237,7 +234,6 @@ export default function AdminLayout() {
                       </p>
                     </div>
                   </div>
-
                   {/* Dark Mode toggle */}
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3 text-sm font-medium text-gray-800 dark:text-white">
@@ -257,9 +253,7 @@ export default function AdminLayout() {
                       />
                     </button>
                   </div>
-
                   <div className="border-t border-gray-200 dark:border-gray-600 my-3" />
-
                   {/* Change Password */}
                   <button
                     onClick={handleChangePassword}
@@ -268,10 +262,9 @@ export default function AdminLayout() {
                     <FiKey size={18} />
                     Change Password
                   </button>
-
                   {/* Logout */}
                   <button
-                    onClick={handleLogout}
+                    onClick={handleLogoutClick}
                     className="mt-1 flex items-center gap-3 w-full text-left px-3 py-2 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-medium"
                   >
                     <FiLogOut size={18} />
@@ -343,12 +336,23 @@ export default function AdminLayout() {
             </span>
           </div>
         </header>
-
         {/* Main Content Area */}
         <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-gray-900 overflow-y-auto mt-16 md:mt-0 mb-16 md:mb-0">
           <Outlet />
         </main>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmationModal
+        open={showLogoutConfirm}
+        onClose={() => setShowLogoutConfirm(false)}
+        onConfirm={handleLogoutConfirm}
+        title="Confirm Logout"
+        message="Are you sure you want to logout? You'll need to sign in again to access your account."
+        confirmText="Logout"
+        cancelText="Cancel"
+        type="warning"
+      />
     </div>
   )
 }
