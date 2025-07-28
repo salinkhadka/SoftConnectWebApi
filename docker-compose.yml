@@ -17,7 +17,7 @@ services:
     build: 
       context: ./Backend
     ports:
-      - "${PORT}:${PORT}"
+      - "2000:2000"   # Hardcoded for clarity
     depends_on:
       - mongo
     networks:
@@ -25,8 +25,8 @@ services:
     env_file:
       - .env
     environment:
-      - PORT=${PORT}
-      - MONGO_URI=${MONGO_URI}
+      - PORT=2000
+      - MONGO_URI=mongodb://root:passpass@mongo:27017/SoftConnect?authSource=admin
       - SECRET=${SECRET}
       - EMAIL_USER=${EMAIL_USER}
       - EMAIL_PASS=${EMAIL_PASS}

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Message = require('../Model/MessageModel');
+const User=require('../Model/UserModel')
+const admin = require('../Config/firebase');
 
 
 const getConversationId = (userId1, userId2) => {
@@ -7,9 +9,35 @@ const getConversationId = (userId1, userId2) => {
 };
 
 
+const sendFCMNotification = async (fcmToken, payload, userId) => {
+  try {
+    const response = await admin.messaging().send({
+      ...payload,
+      token: fcmToken,
+    });
+    console.log("Successfully sent FCM notification:", response);
+    return { success: true, response };
+  } catch (error) {
+    console.error("Error sending FCM notification:", error);
+
+    if (error.code === 'messaging/registration-token-not-registered') {
+      console.log(`Invalid FCM token for user ${userId}, removing from database`);
+      try {
+        await User.findByIdAndUpdate(userId, { $unset: { fcmToken: 1 } });
+        console.log(`Successfully removed invalid FCM token for user ${userId}`);
+      } catch (dbError) {
+        console.error('Error removing invalid token from database:', dbError);
+      }
+      return { success: false, error: 'Token invalid and removed' };
+    }
+
+    return { success: false, error: error.message };
+  }
+};
+
 exports.sendMessage = async (req, res) => {
   try {
-    const sender = req.user.id; // from auth middleware
+    const sender = req.user.id;
     const { recipient, content } = req.body;
 
     if (!recipient || !content) {
@@ -18,12 +46,44 @@ exports.sendMessage = async (req, res) => {
 
     const conversationId = getConversationId(sender, recipient);
 
+    // Create the message
     const newMessage = await Message.create({
       sender,
       recipient,
       content,
-      conversationId
+      conversationId,
     });
+
+    // Fetch recipient (lean for performance)
+    const recipientUser = await User.findById(recipient).lean();
+
+    if (recipientUser?.fcmToken) {
+      const payload = {
+        notification: {
+          title: recipientUser.username,
+          body: content,
+        },
+        data: {
+          type: "message",
+          conversationId,
+          senderId: sender.toString(),
+          messageId: newMessage._id.toString(),
+        },
+        android: {
+          priority: 'high',
+        },
+        apns: {
+          headers: {
+            'apns-priority': '10',
+          },
+        },
+      };
+
+      // Send FCM notification
+      await sendFCMNotification(recipientUser.fcmToken, payload, recipient);
+    } else {
+      console.log(`No FCM token found for user ${recipient}`);
+    }
 
     res.status(201).json(newMessage);
   } catch (err) {
@@ -31,6 +91,8 @@ exports.sendMessage = async (req, res) => {
     res.status(500).json({ error: 'Failed to send message' });
   }
 };
+
+
 
 // Get messages between two users
 exports.getMessages = async (req, res) => {
