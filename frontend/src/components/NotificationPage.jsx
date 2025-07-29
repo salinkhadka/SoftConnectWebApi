@@ -1,5 +1,5 @@
 "use client"
-
+import React from "react"
 import { useEffect, useState, useContext } from "react"
 import { getNotifications, markNotificationAsRead, deleteNotification } from "../api/notificationApi"
 import { AuthContext } from "../auth/AuthProvider"

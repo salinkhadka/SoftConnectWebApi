@@ -1,5 +1,5 @@
 "use client"
-
+import React from "react"
 import { useState, useEffect } from "react"
 import { FiMail, FiCalendar } from "react-icons/fi"
 import { useFollowers, useFollowing } from "../hooks/friendsHook"
