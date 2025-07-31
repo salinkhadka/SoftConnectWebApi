@@ -11,12 +11,20 @@ jest.setTimeout(20000);
 let authToken = "";
 let testUserId = "";
 
+// Generate unique identifier for this test run
+const testRunId = `usertest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+const testEmail = `ram345_${testRunId}@gmail.com`;
+
 beforeAll(async () => {
   await connectDB();
-  await User.deleteOne({ email: "ram345@gmail.com" });
+  await User.deleteOne({ email: testEmail });
 });
 
 afterAll(async () => {
+  // Clean up the test user
+  if (testUserId) {
+    await User.deleteOne({ _id: testUserId });
+  }
   await mongoose.disconnect();
 });
 
@@ -32,10 +40,10 @@ describe("User API full suite", () => {
 
   test("Register new user", async () => {
     const res = await request(app).post("/user/register").send({
-      username: "rameyyyyy",
-      email: "ram345@gmail.com",
+      username: `rameyyyyy_${testRunId}`,
+      email: testEmail,
       password: "1234567890",
-      StudentId: 9876,
+      StudentId: parseInt(testRunId.replace(/\D/g, '').slice(-4)) || 9876,
     });
     expect(res.statusCode).toBe(201);
     expect(res.body.success).toBe(true);
@@ -43,7 +51,7 @@ describe("User API full suite", () => {
 
   test("Login existing user", async () => {
     const res = await request(app).post("/user/login").send({
-      email: "ram345@gmail.com",
+      email: testEmail,
       password: "1234567890",
     });
     expect(res.statusCode).toBe(200);
@@ -55,16 +63,16 @@ describe("User API full suite", () => {
   test("Get user by ID", async () => {
     const res = await request(app).get(`/user/${testUserId}`);
     expect(res.statusCode).toBe(200);
-    expect(res.body.data.email).toBe("ram345@gmail.com");
+    expect(res.body.data.email).toBe(testEmail);
   });
 
   test("Update user info", async () => {
     const res = await request(app)
       .put(`/user/${testUserId}`)
       .set("Authorization", `Bearer ${authToken}`)
-      .send({ bio: "Updated Bio" });
+      .send({ bio: `Updated Bio - ${testRunId}` });
     expect(res.statusCode).toBe(200);
-    expect(res.body.data.bio).toBe("Updated Bio");
+    expect(res.body.data.bio).toBe(`Updated Bio - ${testRunId}`);
   });
 
   test("Verify password correctly", async () => {
@@ -79,7 +87,7 @@ describe("User API full suite", () => {
   test("Send password reset email", async () => {
     const res = await request(app)
       .post("/user/request-reset")
-      .send({ email: "ram345@gmail.com" });
+      .send({ email: testEmail });
     expect(res.statusCode).toBe(200);
     expect(res.body.success).toBe(true);
   });

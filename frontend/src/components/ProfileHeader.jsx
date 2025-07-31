@@ -10,6 +10,7 @@ import EditProfileDialog from "./EditProfileDialog"
 import FollowersFollowingModal from "./FollowersFollowingModal"
 import { FiUser, FiAward, FiHash, FiMail, FiCalendar, FiFileText } from "react-icons/fi"
 
+
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
 const WHITE = "#FFFFFF"

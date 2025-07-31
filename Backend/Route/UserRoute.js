@@ -19,5 +19,8 @@ router.post("/verify-password",userController.verifyPassword)
 
 router.post("/uploadImg",fileUpload.single("profilePhoto"),userController.uploadImage);
 
+router.post("/google-login", userController.googleLogin);
+
+
 
 module.exports = router;

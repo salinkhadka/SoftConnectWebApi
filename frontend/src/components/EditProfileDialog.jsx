@@ -68,14 +68,65 @@ export default function EditProfileDialog({ open, setOpen, user, onUpdateUser, p
           email: Yup.string().email("Invalid email").required("Email is required"),
           bio: Yup.string().max(300, "Bio must be under 300 characters"),
         })}
-        onSubmit={(values, { setSubmitting }) => {
+        onSubmit={async (values, { setSubmitting }) => {
           const formData = new FormData()
           formData.append("username", values.username)
           formData.append("email", values.email)
           formData.append("bio", values.bio)
-          if (values.profilePhoto) {
-            formData.append("profilePhoto", values.profilePhoto)
+          
+          // Handle profile photo properly
+          if (values.profilePhoto && values.profilePhoto instanceof File) {
+            // New file uploaded - first upload the image to get URL
+            console.log("Uploading new file:", values.profilePhoto.name)
+            
+            try {
+              // Upload image first
+              const imageFormData = new FormData()
+              imageFormData.append("profilePhoto", values.profilePhoto)
+              
+              const response = await fetch("http://localhost:2000/user/uploadImg", {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                body: imageFormData,
+              })
+              
+              const result = await response.json()
+              
+              if (result.success) {
+                const imageUrl = result.data // This should be "uploads/filename.png"
+                console.log("Got image URL from upload:", imageUrl)
+                formData.append("profilePhoto", imageUrl)
+              } else {
+                throw new Error("Image upload failed")
+              }
+            } catch (error) {
+              console.error("Error uploading image:", error)
+              setSubmitting(false)
+              return
+            }
+          } else if (user.profilePhoto) {
+            // Keep existing image - ensure it has uploads/ prefix
+            let imageUrl = user.profilePhoto
+            
+            console.log("Original user.profilePhoto:", imageUrl)
+            
+            // If it's a local filename without uploads/ prefix, add it
+            if (imageUrl && !imageUrl.startsWith('uploads/') && !imageUrl.startsWith('http')) {
+              imageUrl = `uploads/${imageUrl}`
+              console.log("Added uploads/ prefix:", imageUrl)
+            }
+            
+            console.log("Sending existing image URL:", imageUrl)
+            formData.append("profilePhoto", imageUrl)
           }
+          
+          // Debug: Log all FormData entries
+          for (let [key, value] of formData.entries()) {
+            console.log(`FormData ${key}:`, value)
+          }
+          
           onUpdateUser(formData)
           setSubmitting(false)
           setOpen(false)

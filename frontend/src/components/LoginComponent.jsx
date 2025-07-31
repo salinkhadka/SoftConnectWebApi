@@ -4,11 +4,14 @@ import { useContext } from "react"
 import { useFormik } from "formik"
 import * as Yup from "yup"
 import { useLogin } from "../hooks/useLogin"
-import { AuthContext } from "../auth/AuthProvider"
+import { AuthContext} from "../auth/AuthProvider"
 import { useToast } from "../contexts/ToastContext"
 import { Link } from "react-router-dom"
 import logo from "../assets/logo.png"
 import { useNavigate } from "react-router-dom"
+import { signInWithPopup } from "firebase/auth"
+import { auth, provider } from "../auth/firebase"
+import axios from 'axios';
 
 const PURPLE = "#37225C"
 const LAVENDER = "#B8A6E6"
@@ -16,7 +19,7 @@ const WHITE = "#FFFFFF"
 
 export default function LoginForm() {
   const { mutate, isPending, isSuccess, data } = useLogin()
-  const { user } = useContext(AuthContext)
+  const { user,login } = useContext(AuthContext)
   const navigate = useNavigate()
   const toast = useToast()
 
@@ -24,6 +27,67 @@ export default function LoginForm() {
     email: Yup.string().email("Invalid email address").required("Email is required"),
     password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
   })
+
+
+  
+
+
+const handleGoogleLogin = async () => {
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const firebaseUser = result.user;
+
+    // Get the ID token from Firebase
+    const idToken = await firebaseUser.getIdToken();
+
+    // Send the ID token to your backend
+    const res = await axios.post("http://localhost:2000/user/google-login", {
+      idToken: idToken
+    });
+
+    // Handle the response
+    const backendResponse = res.data;
+    
+    if (backendResponse.success) {
+      // Store additional data in localStorage (optional, since login() already stores token and user)
+      localStorage.setItem("userId", backendResponse.data._id);
+      localStorage.setItem("userType", backendResponse.data.role);
+      localStorage.setItem("isLoggedIn", "true");
+
+      // Set axios default authorization header for future requests
+      axios.defaults.headers.common['Authorization'] = `Bearer ${backendResponse.token}`;
+
+      // 🔥 FIXED: Now login is available from the destructured context above
+      login(backendResponse.data, backendResponse.token);
+
+      toast.success("Welcome back!");
+      
+      // Navigate based on user role - the navigation will work now because AuthContext is updated
+      if (backendResponse.data.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/"); // Navigate to root, which will redirect to feed via your route structure
+      }
+    } else {
+      toast.error(backendResponse.message || "Login failed");
+    }
+
+  } catch (error) {
+    console.error("Google login failed", error);
+    
+    // Handle different types of errors
+    if (error.response?.data?.message) {
+      toast.error(error.response.data.message);
+    } else if (error.code === 'auth/popup-closed-by-user') {
+      toast.error("Login cancelled");
+    } else if (error.code === 'auth/popup-blocked') {
+      toast.error("Popup blocked. Please allow popups and try again.");
+    } else {
+      toast.error("Login failed. Please try again.");
+    }
+  }
+};
+
 
   const formik = useFormik({
     initialValues: { email: "", password: "" },
@@ -90,11 +154,10 @@ export default function LoginForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.email}
-                  className={`w-full px-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-gray-700 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 ${
-                    formik.touched.email && formik.errors.email
+                  className={`w-full px-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-gray-700 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 ${formik.touched.email && formik.errors.email
                       ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                       : `border-gray-200 dark:border-gray-600 focus:ring-2`
-                  }`}
+                    }`}
                   style={{
                     focusBorderColor: LAVENDER,
                     focusRingColor: `${LAVENDER}40`,
@@ -121,11 +184,10 @@ export default function LoginForm() {
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}
                   value={formik.values.password}
-                  className={`w-full px-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-gray-700 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 ${
-                    formik.touched.password && formik.errors.password
+                  className={`w-full px-4 py-3 rounded-xl border-2 bg-gray-50 dark:bg-gray-700 dark:text-white transition-all duration-200 focus:outline-none focus:ring-2 ${formik.touched.password && formik.errors.password
                       ? "border-red-300 focus:border-red-500 focus:ring-red-200"
                       : "border-gray-200 dark:border-gray-600"
-                  }`}
+                    }`}
                   placeholder="Enter your password"
                 />
                 {formik.touched.password && formik.errors.password && (
@@ -196,6 +258,52 @@ export default function LoginForm() {
                 )}
               </button>
             </form>
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-500 mb-2">or continue with</p>
+              <button
+                type="button"
+                onClick={handleGoogleLogin}
+                className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-xl border-2 font-semibold text-lg transition-all duration-200 hover:scale-[1.02] hover:shadow-md"
+                style={{
+                  borderColor: PURPLE,
+                  color: PURPLE,
+                  backgroundColor: "transparent",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = LAVENDER
+                  e.target.style.color = WHITE
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = "transparent"
+                  e.target.style.color = PURPLE
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 48 48"
+                  className="w-6 h-6"
+                >
+                  <path
+                    fill="#EA4335"
+                    d="M24 9.5c3.15 0 5.97 1.2 8.15 3.16l6.08-6.08C34.85 3.1 29.7 1 24 1 14.95 1 7.2 6.6 3.88 14.14l7.36 5.7C13.07 13.77 17.93 9.5 24 9.5z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M46.12 24.46C46.12 22.73 45.93 21.1 45.58 19.58H24v9.26h12.4c-.54 3-2.3 5.54-4.89 7.2l7.36 5.7c4.3-3.97 6.25-9.83 6.25-16.74z"
+                  />
+                  <path
+                    fill="#4A90E2"
+                    d="M11.24 28.4a14.5 14.5 0 010-8.8l-7.36-5.7A23.978 23.978 0 000 24c0 3.94.95 7.65 2.65 10.9l8.6-6.5z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M24 47c6.5 0 11.98-2.14 15.97-5.82l-7.36-5.7c-2.06 1.37-4.72 2.16-8.61 2.16-6.07 0-11.24-4.27-13.09-10.1l-8.6 6.5C7.2 41.4 14.95 47 24 47z"
+                  />
+                </svg>
+                Sign in with Google
+              </button>
+            </div>
+
 
             {/* Sign Up Link */}
             <div className="mt-8 text-center">

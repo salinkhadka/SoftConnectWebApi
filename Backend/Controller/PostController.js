@@ -70,7 +70,7 @@ exports.getOnePost = async (req, res) => {
 // Update a post
 exports.updatePost = async (req, res) => {
   const { content, privacy, imageUrl } = req.body;
-  const imageUrlFinal = req.file?.path || imageUrl || '';
+  const imageUrlFinal = req.file?.path || imageUrl;
 
   try {
     // Prepare fields to update

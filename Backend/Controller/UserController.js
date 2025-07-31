@@ -1,8 +1,10 @@
+require('dotenv').config();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../Model/UserModel");
 const nodemailer = require("nodemailer");
 const mongoose = require('mongoose');
+const admin = require('../Config/firebase'); 
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -31,7 +33,7 @@ exports.sendResetLink = async (req, res) => {
     // Encode token URL-safe base64
     const encodedToken = base64urlEncode(token);
 
-    const resetUrl = `${process.env.CLIENT_URL}/reset-password/${encodedToken}`;
+    const resetUrl = `http://localhost:3000/reset-password/${encodedToken}`;
 
     const mailOptions = {
       from: `"SoftConnect" <${process.env.EMAIL_USER}>`,
@@ -57,6 +59,52 @@ exports.sendResetLink = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error" });
   }
 };
+
+
+exports.googleLogin = async (req, res) => {
+  const idToken = req.body.idToken;
+
+  if (!idToken) {
+    return res.status(400).json({ success: false, message: "ID token required" });
+  }
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const { email, name, picture, uid } = decodedToken;
+
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = await User.create({
+        email,
+        username: name,
+        profilePhoto: picture,
+        password: "GOOGLE_AUTH", // placeholder to avoid login via password
+        role: "normal",
+      });
+    }
+
+    // Generate your own JWT token
+    const payload = {
+      _id: user._id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+    };
+    const token = jwt.sign(payload, process.env.SECRET, { expiresIn: "7d" });
+
+    return res.status(200).json({
+      success: true,
+      message: "Google login successful",
+      token,
+      data: user,
+    });
+  } catch (error) {
+    console.error("Google login error:", error);
+    return res.status(401).json({ success: false, message: "Invalid or expired token" });
+  }
+};
+
 
 
 
@@ -289,7 +337,7 @@ exports.uploadImage = (async (req, res, next) => {
   }
   res.status(200).json({
     success: true,
-    data: req.file.filename,
+    data: `uploads/`+req.file.filename,
   });
 });
 
