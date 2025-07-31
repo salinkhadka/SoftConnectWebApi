@@ -5,7 +5,7 @@ const User = require("../Model/UserModel");
 const nodemailer = require("nodemailer");
 const mongoose = require('mongoose');
 const admin = require('../Config/firebase'); 
-
+// test commit update 
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
