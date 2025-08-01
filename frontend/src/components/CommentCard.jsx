@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import { getBackendImageUrl } from "../utils/getBackendImageUrl";
 import WriteComment from "./WriteCommentComponent";
 import { useDeleteComment } from "../hooks/usecommenthook";
@@ -7,11 +8,18 @@ import DeleteModal from "./DeleteModal";
 
 const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=ddd&color=888&name=U";
 
-export default function CommentCard({ comment, allComments, postId, postOwnerId, onReplyPosted }) {
+export default function CommentCard({
+  comment,
+  allComments,
+  postId,
+  postOwnerId,
+  onReplyPosted,
+}) {
   const [showReplyBox, setShowReplyBox] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
+  const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const deleteComment = useDeleteComment();
 
@@ -52,11 +60,15 @@ export default function CommentCard({ comment, allComments, postId, postOwnerId,
           <img
             src={profilePhoto}
             alt="avatar"
-            className="w-10 h-10 rounded-full object-cover border border-gray-300"
+            className="w-10 h-10 rounded-full object-cover border border-gray-300 cursor-pointer"
+            onClick={() => navigate(`/${userInfo._id}`)}
           />
           <div className="flex flex-col flex-grow">
             <div className="flex justify-between items-start">
-              <span className="font-semibold text-sm text-gray-900 dark:text-white">
+              <span
+                className="font-semibold text-sm text-gray-900 dark:text-white cursor-pointer"
+                onClick={() => navigate(`/${userInfo._id}`)}
+              >
                 {username}
               </span>
               {canDelete && (
@@ -114,7 +126,7 @@ export default function CommentCard({ comment, allComments, postId, postOwnerId,
                 comment={reply}
                 allComments={allComments}
                 postId={postId}
-                postOwnerId={postOwnerId} // ✅ Important
+                postOwnerId={postOwnerId}
                 onReplyPosted={onReplyPosted}
               />
             ))}
